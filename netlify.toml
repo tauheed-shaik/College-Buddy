@@ -1,0 +1,14 @@
+[build]
+  publish = "/"
+  command = "# No build command needed for static sites"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[dev]
+  command = "npm run start"
+  targetPort = 8080
+  port = 8888
+  publish = "/"

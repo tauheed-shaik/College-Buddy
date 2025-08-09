@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tara, Virtual Assistant</title>
+    <link rel="icon" type="image/x-icon" href="../assets/images/favicon.ico">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Protest+Guerrilla&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            flex-direction: column;
+        }
+
+        #logo-container {
+            width: 15%; 
+            position: relative;
+        }
+
+        #logo {
+            width: 30%;
+        }
+
+        h1 {
+            color: aliceblue;
+            font-family: "Protest Guerrilla", sans-serif;
+        }
+
+        #name {
+            color: rgb(44, 158, 220);
+            font-size: 50px;
+        }
+
+        #va {
+            color: #ea4c09;
+            font-size: 50px;
+        }
+
+        #voice {
+            width: 250px;
+            display: none;
+        }
+
+        #btn {
+            width: 30%;
+            background: linear-gradient(to right, #ea4c09, rgb(44, 158, 220));
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 20px;
+            border-radius: 20px;
+            color: white;
+            box-shadow: 2px 2px 10px rgb(21, 145, 207), 2px 2px 10px rgb(201, 41, 116);
+            border: none;
+            transition: all 0.5s;
+            cursor: pointer;
+        }
+
+        #btn:hover {
+            box-shadow: 2px 2px 10px rgb(21, 145, 207), 2px 2px 10px rgb(201, 41, 116);
+            letter-spacing: 2px;
+        }
+
+        .footer {
+            background: transparent;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            padding: 10px;
+            position: absolute;
+            bottom: 6px;
+            width: 100%;
+            right: 640px;
+            font-size: 0.8rem;
+        }
+
+        .help-icon {
+            width: 60px;
+            height: 40px;
+            background-color: #8c8f90;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            cursor: pointer;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .question-mark {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        /* Optional: Hover effect */
+        .help-icon:hover {
+            background-color: #bd5a09;
+        }
+
+        /* Mobile responsive adjustments */
+        @media screen and (max-width: 768px) {
+            body {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            h1 {
+                font-size: 30px; /* Adjust font size for smaller screens */
+            }
+
+            #name {
+                font-size: 40px;
+            }
+
+            #va {
+                font-size: 40px;
+            }
+
+            #btn {
+                width: 60%;
+                font-size: 18px;
+                padding: 8px;
+            }
+
+            .footer {
+                font-size: 0.7rem;
+                padding: 8px;
+                right: 0;
+                width: 100%;
+            }
+
+            .help-icon {
+                width: 50px;
+                height: 35px;
+            }
+
+            .help-icon .question-mark {
+                font-size: 20px;
+            }
+        }
+
+        /* For very small screens like phones in portrait mode */
+        @media screen and (max-width: 480px) {
+            #btn {
+                width: 80%;
+                font-size: 16px;
+                padding: 6px;
+            }
+
+            h1 {
+                font-size: 25px;
+            }
+
+            #name {
+                font-size: 35px;
+            }
+
+            #va {
+                font-size: 35px;
+            }
+
+            .footer {
+                font-size: 0.6rem;
+                padding: 5px;
+                right: 0;
+                width: 100%;
+            }
+
+            .help-icon {
+                width: 45px;
+                height: 30px;
+            }
+
+            .help-icon .question-mark {
+                font-size: 18px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <img src="../assets/images/pixelcut-export.png" alt="logo" id="logo">
+    <h1>I am <span id="name">Tara</span>, Your <span id="va">Virtual Assistant</span></h1>
+    <img src="../assets/images/https://mir-s3-cdn-cf.behance.net/project_modules/hd/f4020f114494633.603cbcc781296.gif" alt="voice" id="voice">
+    <button id="btn"><img src="../assets/images/mic.svg" alt="mic"><span id="content">Click Here to Speak</span></button>
+
+    <!-- Help Icon with Question Mark -->
+    <a href="taraHelp.html">
+        <div class="help-icon">
+            <span class="question-mark">?</span>
+        </div>
+    </a>
+
+    <script>
+        let btn = document.querySelector("#btn");
+let content = document.querySelector("#content");
+let voice = document.querySelector("#voice");
+
+let voices = [];
+function loadVoices() {
+    voices = window.speechSynthesis.getVoices();
+}
+
+window.speechSynthesis.onvoiceschanged = loadVoices;
+loadVoices();
+
+function speak(text) {
+    let femaleVoice = voices.find(voice => voice.name.includes("Female") || voice.name.includes("Victoria") || voice.name.includes("Google UK English Female"));
+
+    let text_speak = new SpeechSynthesisUtterance(text);
+    text_speak.voice = femaleVoice || voices[0];
+    text_speak.rate = 1;
+    text_speak.volume = 1;
+    text_speak.pitch = 1;
+    text_speak.lang = "en-GB";
+    window.speechSynthesis.speak(text_speak);
+}
+
+let firstClick = true; // Flag to track first click
+
+function WishMe() {
+    let day = new Date();
+    let hours = day.getHours();
+    if (hours >= 0 && hours < 12) {
+        speak("Good Morning! I am Tara, your SRIT virtual assistant. How can I help you?");
+    } else if (hours >= 12 && hours < 16) {
+        speak("Good Afternoon! I am Tara, your SRIT virtual assistant. How can I help you?");
+    } else {
+        speak("Good Evening! I am Tara, your SRIT virtual assistant. How can I help you?");
+    }
+}
+
+btn.addEventListener('click', () => {
+    if (firstClick) {
+        setTimeout(() => WishMe(), 100); // Delay to ensure voices load
+        firstClick = false; 
+    }
+    recognition.start();
+    btn.style.display = "none";
+    voice.style.display = "block";
+});
+
+let speechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = new speechRecognition();
+recognition.onresult = (event) => {
+    let currentIndex = event.resultIndex;
+    let transcript = event.results[currentIndex][0].transcript;
+    content.innerText = transcript;
+    takeCommand(transcript.toLowerCase());
+};
+
+recognition.onerror = (event) => {
+    speak("Sorry, I didn't catch that. Please try again.");
+    btn.style.display = "flex";
+    voice.style.display = "none";
+};
+
+function takeCommand(message) {
+    btn.style.display = "flex";
+    voice.style.display = "none";
+
+    if (message.includes("who are you") || message.includes("what is your name") || message.includes("what can you do") || message.includes("hi") || message.includes("hello") || message.includes("help")) {
+        speak(`Hello, I am Tara virtual voice assistant i will provide information related to SRIT college`);
+
+    } else if (message.includes("What is your name")) {
+        speak(`Hello, I am Tara virtual voice assistant.`);
+
+    } else if (message.includes("What can you do")) {
+        speak(`Hello, I can provide you any information about SRIT college.`);
+
+    } else if (message.includes("website") || message.includes("home page")) {
+        let page = message.includes("home page") ? "home page" : "website";
+        speak(`Opening the SRIT ${page} for you.`);
+        window.open("https://www.srit.ac.in/", "_blank");
+
+    } else if (message.includes("faculty login") || message.includes("employee login")) {
+        let loginType = message.includes("faculty login") ? "faculty login" : "employee login";
+        speak(`Opening the SRIT ${loginType} for you.`);
+        window.open("http://webprosindia.com/srit/", "_blank");
+
+    } else if (message.includes("student login")) {
+        speak(`Opening the SRIT student login for you.`);
+        window.open("http://webprosindia.com/sritstudent/", "_blank");
+        
+    } else if (message.includes("alumni")) {
+        speak(`Opening the SRIT alumni for you.`);
+        window.open("http://alumni.srit.ac.in/", "_blank");
+        
+    } else if (message.includes("contact") || message.includes("contacts")) {
+        let contactType = message.includes("contact") ? "contact" : "contacts";
+        speak(`Opening the SRIT ${contactType} for you.`);
+        window.open("https://www.srit.ac.in/contact-us/", "_blank");
+
+    } else if (message.includes("vision and mission")) {
+        speak("Opening the SRIT college vision and mission for you.");
+        window.open("https://www.srit.ac.in/vision-mission/", "_blank");
+
+    } else if (message.includes("courses") || message.includes("course")) {
+        let courseType = message.includes("courses") ? "courses" : "course";
+        speak(`Opening the SRIT ${courseType} for you.`);
+        window.open("https://www.srit.ac.in/courses-offered/", "_blank");
+
+    } else if (message.includes("admission") || message.includes("admissions")) {
+        let admissionType = message.includes("admission") ? "admission" : "admissions";
+        speak(`Opening the SRIT ${admissionType} for you.`);
+        window.open("https://www.srit.ac.in/admission-procedure/", "_blank");
+
+    } else if (message.includes("location of exam section")) {
+        speak("Opening location of exam section for you.");
+        window.open("examsection.html", "_blank");
+
+    } else if (message.includes("location of fee payment")) {
+        speak("Opening location of fee payment for you.");
+        window.open("feepayment.html", "_blank");
+
+    } else if (message.includes("e-services") || message.includes("exam portal") || message.includes("result") || message.includes("fee payment") || message.includes("payment") || message.includes("pay")) {
+        let eserviceType = message.includes("e-services") ? "eservices" :
+                     message.includes("exam portal") ? "exam portal" :
+                     message.includes("result") ? "result" :
+                     message.includes("fee payment") ? "fee payment" :
+                     message.includes("payment") ? "payment" :  "pay" ;
+        speak(`Opening the SRIT ${eserviceType} for you.`);
+        window.open("https://sritexams.in/eportal/Login.aspx", "_blank");
+
+    } else if (message.includes("fee") || message.includes("fees")) {
+        let feeType = message.includes("fee") ? "fee" : "fees";
+        speak(`Opening the SRIT ${feeType} for you.`);
+        window.open("https://www.srit.ac.in/fee-structure/", "_blank");
+
+    } else if (message.includes("eamcet") || message.includes("eapcet") || message.includes("rank") || message.includes("ranks")) {
+        let rankType = message.includes("eamcet") ? "eamcet" :
+                       message.includes("eapcet") ? "eapcet" :
+                       message.includes("rank") ? "rank" : "ranks";
+        speak(`Opening the SRIT ${rankType} for you.`);
+        window.open("https://www.srit.ac.in/eamcet-ranking/", "_blank");
+
+    } else if (message.includes("academic calendar") || message.includes("academic calendars") || message.includes("calendars") || message.includes("calendar") || message.includes("annual calendar")) {
+        let calenderType = message.includes("academic calendar") ? "academic calendar" :
+                           message.includes("academic calendars") ? "academic calendars" :
+                           message.includes("calendars") ? "calendars" : "calendar" ;
+        speak(`Opening the SRIT ${calenderType} for you.`);
+        window.open("https://www.srit.ac.in/academic-calendars/", "_blank");
+
+    } else if (message.includes("acadamic regulations") || message.includes("regulations") ||  message.includes("regulation")){
+        let regulationsType = message.includes("acadamic regulations") ? "acadamic regulations" :
+                              message.includes("regulations") ? "regulations" : "regulation"
+        speak(`Opening the SRIT ${regulationsType} for you.`);
+        window.open("https://www.srit.ac.in/academic-regulations/", "_blank");
+
+    } else if (message.includes("acadamic regulations") || message.includes("regulations") ||  message.includes("regulation")){
+        let regulationsType = message.includes("acadamic regulations") ? "acadamic regulations" :
+                              message.includes("regulations") ? "regulations" : "regulation"
+        speak(`Opening the SRIT ${regulationsType} for you.`);
+        window.open("https://www.srit.ac.in/academic-regulations/", "_blank");
+
+    } else if (message.includes("cse hod") || message.includes("veera prakash") || message.includes("veeraprakash")) {
+        let cseHOD = message.includes("cse hod") ? "cse h o d" : 
+                     message.includes("veera prakash") ? "veera prakash sir" : "veeraprakash sir";
+        speak(`Opening ${cseHOD} profile for you.`);
+        window.open("https://sites.google.com/view/pvprakash/home", "_blank");
+
+    } else if (message.includes("location of csd department") || message.includes("location of csm department") ||  message.includes("location of csd hod cabin") || message.includes("location of csm hod cabin")){
+        let loccsdm = message.includes("location of csd department") ? "location of csd department" :
+                     message.includes("location of csm department") ? "location of csm department" :
+                     message.includes("location of csd hod cabin") ? "location of csd hod cabin" : "location of csm hod cabin" ;
+        speak(`Opening the SRIT ${loccsdm} for you.`);
+        window.open("csd and csm dept.html", "_blank");
+
+    }  else if (message.includes("location of cse hod cabin") || message.includes("location of cse department")) {
+        let loccse = message.includes("location of cse hod cabin") ? "location of cse hod cabin" : "location of cse department";
+        speak(`Opening the SRIT ${loccse} for you.`);
+        window.open("csehodcabin.html", "_blank");
+
+    } else if (message.includes("csd hod") || message.includes("csm hod") || message.includes("chitralingappa") || message.includes("chitra lingappa")) {
+        let csdHOD = message.includes("csd hod") ? "csd h o d" :
+                     message.includes("csm hod") ? "csm h o d" : 
+                     message.includes("chitralingappa") ? "chitralingappa sir" :"chitra lingappa sir";
+        speak(`Opening ${csdHOD} profile for you.`);
+        window.open("https://sites.google.com/view/drpcl/home", "_blank");
+
+    } else if (message.includes("location of ece hod cabin") || message.includes("location of ece department")) {
+        let locece = message.includes("location of ece hod cabin") ? "location of ece hod cabin" : "location of ece department";
+        speak(`Opening the SRIT ${locece} for you.`);
+        window.open("ece dept.html", "_blank");
+
+    } else if (message.includes("ece hod") || message.includes("ravi chandra") || message.includes("ravichandra")) {
+        let eceHOD = message.includes("ece hod") ? "ece h o d" : 
+                     message.includes("ravi chandra") ? "ravi chandra sir" :"ravichandra sir";
+        speak(`Opening ${eceHOD} profile for you.`);
+        window.open("https://sites.google.com/view/drmlravichandra/", "_blank");
+
+    } else if (message.includes("location of eee hod cabin") || message.includes("location of eee department")) {
+        let loceee = message.includes("location of eee hod cabin") ? "location of eee hod cabin" : "location of eee department";
+        speak(`Opening the SRIT ${loceee} for you.`);
+        window.open("eee dept.html", "_blank");
+
+    } else if (message.includes("eee hod") || message.includes("merimata") || message.includes("meri mata")) {
+        let eeeHOD = message.includes("eee hod") ? "eee h o d" : 
+                     message.includes("meerimatha") ? "meerimatha madam" :"meeri matha madam";
+        speak(`Opening ${eeeHOD} profile for you.`);
+        window.open("https://sites.google.com/view/meerimathaeee/home?authuser=0", "_blank");
+
+    } else if (message.includes("location of civil hod cabin") || message.includes("location of civil department")) {
+        let loccivil = message.includes("location of civil hod cabin") ? "location of civil hod cabin" : "location of civil department";
+        speak(`Opening the SRIT ${loccivil} for you.`);
+        window.open("civil dept.html", "_blank");
+
+    } else if (message.includes("civil hod") || message.includes("chinna venkata") || message.includes("chinnavenkata")) {
+        let civHOD = message.includes("civil hod") ? "civil h o d" : 
+                     message.includes("chinna venkata") ? "chinna venkata sir" : "chinnavenkata sir";
+        speak(`Opening ${civHOD} profile for you.`);
+        window.open("https://sites.google.com/srit.ac.in/drtcvenkatareddy/home", "_blank");
+
+    } else if (message.includes("location of mechanical hod cabin") || message.includes("location of mechanical department")) {
+        let locmec = message.includes("location of mechanical hod cabin") ? "location of mechanical hod cabin" : "location of mechanical department";
+        speak(`Opening the SRIT ${locmec} for you.`);
+        window.open("mechanical hod cabin dept.html", "_blank");
+
+    } else if (message.includes("mec hod") || message.includes("vamsi krishna") || message.includes("mechanical hod") || message.includes("vamsikrishana")) {
+        let mecHOD = message.includes("mec hod") ? "mec h o d" : 
+                     message.includes("mechanical hod") ? "mechanical h o d" : 
+                     message.includes("vamsi krishna") ? "vamsi krishna sir" : "vamsikrishna sir" ; 
+        speak(`Opening ${mecHOD} profile for you.`);
+        window.open("https://sites.google.com/view/vamsi-krishna-reddy/home?authuser=0", "_blank");
+
+    } else if (message.includes("cse") || message.includes("computer science")) {
+        let cseDep = message.includes("cse") ? "cse" : "computer science";
+        speak(`Opening the SRIT ${cseDep} for you.`);
+        window.open("https://www.srit.ac.in/computer-science-engineering-2/", "_blank");
+
+    } else if (message.includes("csm") || message.includes("artificial intelligence") || message.includes("machine learning") || message.includes("aiml") || message.includes("ai and ml")) {
+        let csmDep = message.includes("csm") ? "csm" :
+                     message.includes("artificial intelligence") ? "artificial intelligence" :
+                     message.includes("machine learning") ? "machine learning" :  
+                     message.includes("aiml") ? "aiml" : "ai and ml";
+        speak(`Opening the SRIT ${csmDep} for you.`);
+        window.open("https://www.srit.ac.in/cse-artificial-intelligence-machine-learning-2/", "_blank");
+
+    } else if (message.includes("csd") || message.includes("data science") ||  message.includes("ds")){
+        let csdDep = message.includes("csd") ? "csd" :
+                     message.includes("data science") ? "data science" : "ds" ;
+        speak(`Opening the SRIT ${csdDep} for you.`);
+        window.open("https://www.srit.ac.in/cse-data-science", "_blank");
+
+    } else if (message.includes("ece") || message.includes("electronics and communication")) {
+        let eceDep = message.includes("ece") ? "ece" : "electronics and communication";
+        speak(`Opening the SRIT ${eceDep} for you.`);
+        window.open("https://www.srit.ac.in/electronics-communication-engineering-2/", "_blank");
+
+    }  else if (message.includes("iete") || message.includes("institute of electronics and telecommunication engineers")) {
+        let ieteClub = message.includes("iete") ? "iete" : "institute of electronics and telecommunication engineers";
+        speak(`Opening the SRIT ${ieteClub} for you.`);
+        window.open(" https://www.srit.ac.in/iete//", "_blank");
+
+    } else if (message.includes("eee") || message.includes("electrical") ||  message.includes("electronics")){
+        let eeeDep = message.includes("eee") ? "eee" :
+                     message.includes("electrical") ? "electrical" : "electronics" ;
+        speak(`Opening the SRIT ${eeeDep} for you.`);
+        window.open("https://www.srit.ac.in/eee-2/", "_blank");
+
+    } else if (message.includes("mechanical") || message.includes("mec")) {
+        let mecDep = message.includes("mechanical") ? "mechanical" : "mec";
+        speak(`Opening the SRIT ${mecDep} for you.`);
+        window.open("https://www.srit.ac.in/mec-2/", "_blank");
+
+    } else if (message.includes("civil") || message.includes("civ")) {
+        let civDep = message.includes("civil") ? "civil" : "civ";
+        speak(`Opening the SRIT ${civDep} for you.`);
+        window.open("https://www.srit.ac.in/civil-engineering-2/", "_blank");
+
+    } else if (message.includes("location of h and s hod cabin") || message.includes("location of h and s department")) {
+        let lochands = message.includes("location of h and s hod cabin") ? "location of h and s hod cabin" : "location of h and s hod cabin";
+        speak(`Opening the SRIT ${lochands} for you.`);
+        window.open("h and s hod cabin.html", "_blank");
+
+    }else if (message.includes("h and s") || message.includes("humanities") ||  message.includes("sciences") || message.includes("h&s")){
+        let hsDep = message.includes("h and s") ? "h and s" :
+                     message.includes("humanities") ? "humanities" :
+                     message.includes("sciences") ? "sciences" : "h&s" ;
+        speak(`Opening the SRIT ${hsDep} for you.`);
+        window.open("https://www.srit.ac.in/humanities-science-2/", "_blank");
+
+    } else if (message.includes("chairman's club") || message.includes("chairmans")) {
+        let chairmanClub = message.includes("chairman's club") ? "chairman's club" : "chairmans";
+        speak(`Opening the SRIT ${chairmanClub} for you.`);
+        window.open("https://www.srit.ac.in/chairmansclub/", "_blank");
+
+    } else if (message.includes("iei") || message.includes("institute of engineers")) {
+        let ieiClub = message.includes("iei") ? "iei" : "institute of engineers";
+        speak(`Opening the SRIT ${ieiClub} for you.`);
+        window.open("https://www.srit.ac.in/iei/", "_blank");
+
+    } else if (message.includes("internet society")) {
+        speak("Opening the SRIT internet society for you.");
+        window.open("https://www.srit.ac.in/internet-society", "_blank");
+
+    } else if (message.includes("ici") || message.includes("indian concrete institute")) {
+        let iciClub = message.includes("ici") ? "ici" : "indian concrete institute";
+        speak(`Opening the SRIT ${iciClub} for you.`);
+        window.open("https://www.srit.ac.in/ici/", "_blank");
+
+    } else if (message.includes("iste") || message.includes("indian society for technical education")) {
+        let isteClub = message.includes("iste") ? "iste" : "indian society for technical education";
+        speak(`Opening the SRIT ${isteClub} for you.`);
+        window.open("https://www.srit.ac.in/iste/", "_blank");
+
+    } else if (message.includes("sae") || message.includes("society of automotive engineering")) {
+        let saeClub = message.includes("sae") ? "sae" : "society of automotive engineering";
+        speak(`Opening the SRIT ${saeClub} for you.`);
+        window.open("https://www.srit.ac.in/sae/", "_blank");
+
+    } else if (message.includes("toastmasters")) {
+        speak("Opening the SRIT toastmaster's club for you.");
+        window.open("https://www.srit.ac.in/toast-masters-international-club/", "_blank");
+
+    }  else if (message.includes("english club") || message.includes("english language club")) {
+        let englishClub = message.includes("english club") ? "english club" : "english language club";
+        speak(`Opening the SRIT ${englishClub} for you.`);
+        window.open("https://www.srit.ac.in/english-language-club/", "_blank");
+
+    } else if (message.includes("location of library")) {
+        speak("Opening location of library for you.");
+        window.open("library.html", "_blank");
+
+    } else if (message.includes("ndli") || message.includes("national digital library of india club") || (message.includes("library"))) {
+        let ndliClub = message.includes("ndli") ? "ndli" :
+                       message.includes("national digital library of india club") ? "national digital library of india club" : "library";
+        speak(`Opening the SRIT ${ndliClub} for you.`);
+        window.open("https://www.srit.ac.in/ndli-club/", "_blank");
+
+    } else if (message.includes("programmers")) {
+        speak("Opening the SRIT programmer's club for you.");
+        window.open("https://www.srit.ac.in/programmers-club", "_blank");
+
+    } else if (message.includes("notifications and results")) {
+        speak("Opening the SRIT notifications and results for you.");
+        window.open("https://www.srit.ac.in/notifications/", "_blank");
+
+    } else if (message.includes("previous question papers")) {
+        speak("Opening the SRIT previous question papers for you.");
+        window.open("https://www.srit.ac.in/previous-question-papers/", "_blank");
+
+    } else if (message.includes("exam committee") || message.includes("examination committee") ||  message.includes("exam section") || message.includes("examination section")){
+        let examSection = message.includes("exam committee") ? "exam committee" :
+                     message.includes("examination committee") ? "examination committee" :
+                     message.includes("exam section") ? "exam section" : "examination section" ;
+        speak(`Opening the SRIT ${examSection} for you.`);
+        window.open("https://www.srit.ac.in/exam-committee/", "_blank");
+
+    } else if (message.includes("results committee")) {
+        speak("Opening the SRIT results committee for you.");
+        window.open("https://www.srit.ac.in/results-committee/", "_blank");
+
+    } else if (message.includes("evaluation") || message.includes("evaluate")) {
+        let evaluationType = message.includes("evaluation") ? "evaluation" : "evaluate";
+        speak(`Opening the SRIT ${evaluationType} for you.`);
+        window.open("https://www.srit.ac.in/evaluation-procedure-2/", "_blank");
+
+    } else if (message.includes("malpractice")) {
+        speak("Opening the SRIT malpractice rules for you.");
+        window.open("https://www.srit.ac.in/malpractice-rules/", "_blank");
+
+    } else if (message.includes("placement committee") || message.includes("placement team") ||  message.includes("placement coordinators") || message.includes("placement coordinator")){
+        let placementTeam = message.includes("placement committee") ? "placement committee" :
+                     message.includes("placement team") ? "placement team" :
+                     message.includes("placement coordinators") ? "placement coordinators" : "placement coordinator" ;
+        speak(`Opening the SRIT ${placementTeam} for you.`);
+        window.open("https://www.srit.ac.in/training-placement-team-members/", "_blank");
+
+    } else if (message.includes("training") || message.includes("training and placement")) {
+        let trainingType = message.includes("training") ? "training" : "training and placement";
+        speak(`Opening the SRIT ${trainingType} for you.`);
+        window.open("https://www.srit.ac.in/training-program/", "_blank");
+
+    } else if (message.includes("campus drives") || message.includes("drives") || message.includes("drive")) {
+        let drives = message.includes("campus drives") ? "campus drives" : 
+                     message.includes("drives") ? "drives" : "drive" ;
+        speak(`Opening the SRIT ${drives} for you.`);
+        window.open("https://www.srit.ac.in/campus-drives/", "_blank");
+
+    } else if (message.includes("placements") || message.includes("placement")) {
+        let placementType = message.includes("placements") ? "placements" : "placement";
+        speak(`Opening the SRIT ${placementType} for you.`);
+        window.open("https://www.srit.ac.in/training-placement-statistics/", "_blank");
+
+    } else if (message.includes("location of sports") || message.includes("location of ncc")) {
+        let locncc = message.includes("location of sports") ? "location of sports" : "location of ncc";
+        speak(`Opening the SRIT ${locncc} for you.`);
+        window.open("https://www.srit.ac.in/training-placement-statistics/", "_blank");
+
+    } else if (message.includes("ncc") || message.includes("national cadet corps")) {
+        let nccType = message.includes("ncc") ? "ncc" : "national cadet corps";
+        speak(`Opening the SRIT ${nccType} for you.`);
+        window.open("https://www.srit.ac.in/national-cadet-corps/", "_blank");
+
+    } else if (message.includes("nss") || message.includes("national service scheme")) {
+        let nccType = message.includes("nss") ? "nss" : "national service scheme";
+        speak(`Opening the SRIT ${nccType} for you.`);
+        window.open("https://www.srit.ac.in/national-service-scheme/", "_blank");
+
+    } else if (message.includes("rotaract")) {
+        speak("Opening the SRIT rotaract club for you.");
+        window.open("https://www.srit.ac.in/rotaract-club/", "_blank");
+
+    } else if (message.includes("instagram")) {
+        speak("Opening the SRIT instagram for you.");
+        window.open("https://www.instagram.com/sritatp/", "_blank");
+
+    } else if (message.includes("twitter")) {
+        speak("Opening the SRIT twitter for you.");
+        window.open(" https://x.com/sritatp/?mx=2", "_blank");
+
+    } else if (message.includes("facebook")) {
+        speak("Opening the SRIT facebook for you.");
+        window.open("https://www.facebook.com/@sritatp/?ref=embed_page", "_blank");
+
+    } else if (message.includes("youtube")) {
+        speak("Opening the SRIT youtube for you.");
+        window.open("https://www.youtube.com/channel/UC_J4p9Xovt4UGP6ddPzr42g", "_blank");
+
+    } else if (message.includes("linkedin")) {
+        speak("Opening the SRIT linkedin for you.");
+        window.open("https://www.linkedin.com/school/sritatp/", "_blank");
+
+    } else if (message.includes("chairperson")) {
+        speak("Opening the SRIT chairperson for you.");
+        window.open("https://www.srit.ac.in/about-chairperson/", "_blank");
+
+    } else if (message.includes("secretary") || message.includes("founder")) {
+        let founter = message.includes("secretary") ? "secretary" : "founder";
+        speak(`Opening the SRIT ${founter} for you.`);
+        window.open("https://www.srit.ac.in/about-founder-secretary/", "_blank");
+
+    }  else if (message.includes("location of principal")) {
+        speak("Opening location of principal room for you.");
+        window.open("principalroom.html", "_blank");
+
+    } else if (message.includes("principal") || message.includes("balakrishna")) {
+        let principal = message.includes("principal") ? "principal" : "balakrishna" ;
+        speak(`Opening the SRIT ${principal} sir for you.`);
+        window.open("https://www.srit.ac.in/principal/", "_blank");
+
+    } else if (message.includes("academic council")) {
+        speak("Opening the SRIT academic council for you.");
+        window.open(" https://www.srit.ac.in/academic-council/", "_blank");
+
+    } else if (message.includes("newsletter") || message.includes("newsletters")) {
+        let newsletter = message.includes("newsletter") ? "newsletter" : "newsletters";
+        speak(`Opening the SRIT ${newsletter} for you.`);
+        window.open("https://www.srit.ac.in/about-founder-secretary/", "_blank");
+
+    } else if (message.includes("ranjit") || message.includes("ranjith reddy")) {
+        let ranjithFaculty = message.includes("ranjit") ? "ranjit" : "ranjit reddy";
+        speak(`Opening ${ranjithFaculty} sir profile for you.`);
+        window.open("https://sites.google.com/view/ranjit", "_blank");
+
+    }  else if (message.includes("venkata naga jayudu") || message.includes("venkata naga")) {
+        let jayudu=message.includes("venkata naga jayudu") ? "venkata naga jayudu" : "venkata naga"
+        speak(`Opening ${jayudu} sir profile for you.`);
+        window.open(" https://sites.google.com/prod/view/tvnjayudu", "_blank");
+
+    } else if (message.includes("hemant kumar") || message.includes("hemant kumar yadav")) {
+        let hemanthFaculty = message.includes("hemant kumar") ? "hemanth kumar" : "hemanth kumar yadav";
+        speak(`Opening ${hemanthFaculty} sir profile for you.`);
+        window.open("https://sites.google.com/srit.ac.in/hemanthkumaryadav-cse/home", "_blank");
+
+    }  else if (message.includes("sasikala")) {
+        speak("Opening sasikala madam profile for you.");
+        window.open(" https://sites.google.com/view/drcsasikala/home", "_blank");
+
+    } else if (message.includes("hari chandana") || message.includes("harichandana")) {
+        let harichandana = message.includes("hari chandana") ? "hari chandana" : "harichandana"
+        speak(`Opening ${harichandana} madam profile for you.`);
+        window.open("https://sites.google.com/srit.ac.in/harichandana/home", "_blank");
+
+    } else if (message.includes("suman")) {
+        speak("Opening suman sir profile for you.");
+        window.open("https://sites.google.com/srit.ac.in/ssuman/home", "_blank");
+
+    } else if (message.includes("narasimhulu") || message.includes("narasimulu")) {
+        let narasimhulu = message.includes("narasimhulu") ? "narasimhulu" : "narasimulu";
+        speak(`Opening ${narasimhulu} sir profile for you.`);
+        window.open("https://sites.google.com/view/mr-m-narasimhulu/home", "_blank");
+
+    } else if (message.includes("chinna pullaiah") || message.includes("chinna")) {
+        let chinna = message.includes("chinna pullaiah") ? "chinna pullaiah" : "chinna pullaiah";
+        speak(`Opening ${chinna} sir profile for you.`);
+        window.open("https://sites.google.com/srit.ac.in/gandla-chinna-pullaiah", "_blank");
+
+    } else if (message.includes("sudheer kumar") || message.includes("sudheer")) {
+        let sudheerFaculty = message.includes("sudheer kumar") ? "sudheer kumar" : "sudheer";
+        speak(`Opening ${sudheerFaculty} sir profile for you.`);
+        window.open("https://sites.google.com/srit.ac.in/sudheerkumar/home", "_blank");
+
+    } else if (message.includes("kavitha") || message.includes("kavita")) {
+        let kavitha = message.includes("kavitha") ? "kavitha" : "kavitha"
+        speak(`Opening ${kavitha} madam profile for you.`);
+        window.open("https://sites.google.com/srit.ac.in/kavitha", "_blank");
+
+    } else if (message.includes("soumya")) {
+        speak("Opening soumya profile for you.");
+        window.open("https://sites.google.com/srit.ac.in/soumya-madduru/home", "_blank");
+
+    } else if (message.includes("kondanna") || message.includes("kondana")) {
+        let kondanna = message.includes("kondanna") ? "kondanna" : "kondanna";
+        speak(`Opening ${kondanna} sir profile for you.`);
+        window.open("https://sites.google.com/view/kondanna/home", "_blank");
+
+    } else if (message.includes("lokeswari") || message.includes("lokeshwari")) {
+        let lokeswari = message.includes("lokeswari") ? "lokeswari" : "lokeswari"
+        speak(`Opening ${lokeswari} madam profile for you.`);
+        window.open("https://sites.google.com/srit.ac.in/lokeswarig/home", "_blank");
+
+    } else if (message.includes("lokesh") || message.includes("lokeshnath")) {
+        let lokeshFaculty = message.includes("lokesh") ? "lokesh" : "lokeshnath";
+        speak(`Opening ${lokeshFaculty} sir profile for you.`);
+        window.open("https://sites.google.com/srit.ac.in/lokeshnath-k/home", "_blank");
+
+    } else if (message.includes("usha sree") || message.includes("usha")) {
+        let usha = message.includes("usha sree") ? "usha sree" : "usha sree"
+        speak(`Opening ${usha} madam profile for you.`);
+        window.open("https://sites.google.com/view/ushasree/home", "_blank");
+
+    } else if (message.includes("nagaleela") || message.includes("naga leela")) {
+        let nagaleelaFaculty = message.includes("nagaleela") ? "nagaleela" : "naga leela";
+        speak(`Opening ${nagaleelaFaculty} madam profile for you.`);
+        window.open("https://sites.google.com/srit.ac.in/nagaleela-g/home", "_blank");
+
+    } else if (message.includes("ganesh")) {
+        speak("Opening ganesh sir profile for you.");
+        window.open("https://sites.google.com/srit.ac.in/ganeshcse/home", "_blank");
+
+    } else if (message.includes("vijaya bhaskar reddy") || message.includes("vijaya")) {
+        let vijaya = message.includes("vijaya bhaskar reddy") ? "vijaya bhaskar reddy" : "vijaya bhaskar reddy" ;
+        speak(`Opening ${vijaya} sir profile for you.`);
+        window.open("https://sites.google.com/view/vjaireddy/home", "_blank");
+
+    } else if (message.includes("nagesh")) {
+        speak("Opening nagesh profile for you.");
+        window.open("https://sites.google.com/srit.ac.in/nagesh-cse/home", "_blank");
+
+    } else if (message.includes("location of basketball")) {
+        speak("Opening location of basketball for you.");
+        window.open("basketball.html", "_blank");
+
+    }  else if (message.includes("location of a block seminar hall")) {
+        speak("Opening location of a block seminar hall for you.");
+        window.open("ablockseminarhall.html", "_blank");
+
+    } else if (message.includes("location of b block seminar hall")) {
+        speak("Opening location of b block seminar hall for you.");
+        window.open("bblockseminarhall.html", "_blank");
+
+    } else if (message.includes("location of boys washroom")) {
+        speak("Opening location of boys washroom for you.");
+        window.open("boys washroom.html", "_blank");
+
+    } else if (message.includes("location of boys hostel")) {
+        speak("Opening location of boys hostel for you.");
+        window.open("boyshostel.html", "_blank");
+
+    } else if (message.includes("location of canteen")) {
+        speak("Opening location of canteen for you.");
+        window.open("canteen.html", "_blank");
+
+    } else if (message.includes("location of chemistry lab")) {
+        speak("Opening location of chemistry lab for you.");
+        window.open("chemistrylab.html", "_blank");
+
+    } else if (message.includes("location of computer lab")) {
+        speak("Opening location of computer labs for you.");
+        window.open("computer labs.html", "_blank");
+
+    } else if (message.includes("location of girls hostel")) {
+        speak("Opening location of girls hostel for you.");
+        window.open("girlshostel.html", "_blank");
+
+    } else if (message.includes("location of girls washroom")) {
+        speak("Opening location of girls washroom for you.");
+        window.open("girlswashroom.html", "_blank");
+
+    } else if (message.includes("location of ground")) {
+        speak("Opening location of ground floor for you.");
+        window.open("ground.html", "_blank");
+
+    } else if (message.includes("location of main block seminar hall")) {
+        speak("Opening location of main block seminar hall for you.");
+        window.open("mainblockseminarhall.html", "_blank");
+
+    } else if (message.includes("location of physics lab")) {
+        speak("Opening location of physics lab for you.");
+        window.open("physics lab.html", "_blank");
+
+    } else if (message.includes("location of staff room")) {
+        speak("Opening location of staff room for you.");
+        window.open("staffroom.html", "_blank");
+
+    } else if (message.includes("location of waterfacility")) {
+        speak("Opening location of waterfacility for you.");
+        window.open("waterfacility.html", "_blank");
+
+    } else { 
+        speak("I'm sorry, I can only provide information related to SRIT. How else can I assist you?");
+    }
+}
+    </script>
+    <div class="footer">
+        <p>&copy; Tara Virtual Assistant | All Rights Reserved</p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,2565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>College Chatbot</title>
+  <link rel="icon" type="image/x-icon" href="../assets/images/favicon.ico">
+  <style>
+    /* General Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background-color: #E5DDD5; /* Default Light Mode Background */
+      color: black; /* Default Light Mode Text */
+    }
+
+    body.dark-mode {
+      background-color: #5b5151; /* Dark Mode Background */
+      color: white; /* Dark Mode Text */
+    }
+
+    .header {
+      background-color: #FF9800;
+      color: white;
+      padding: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .header h1 {
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .menu {
+      font-size: 24px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .popup {
+      display: none;
+      position: absolute;
+      top: 50px;
+      right: 15px;
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      padding: 10px;
+      z-index: 100;
+    }
+
+    body.dark-mode .popup {
+      background-color: #1e1e1e; /* Dark mode popup background */
+      border-color: #444; /* Dark mode popup border */
+    }
+
+    .popup button {
+      background-color: #b78a18;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+      width: 100%;
+    }
+
+    .popup button:hover {
+      background-color: #128C7E;
+    }
+
+    .chat-container {
+      flex-grow: 1;
+      padding: 15px;
+      background-color: #E5DDD5;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    body.dark-mode .chat-container {
+      background-color: #121212; /* Dark Mode Chat Background */
+    }
+
+    .message {
+      max-width: 70%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 10px;
+      background-color: #DCF8C6;
+      color: black;
+    }
+
+    .message.sent {
+      align-self: flex-end;
+    }
+
+    .message.received {
+      align-self: flex-start;
+    }
+
+    body.dark-mode .message {
+      background-color: #333; /* Dark mode message background */
+      color: white;
+    }
+
+    .input-container {
+      display: flex;
+      padding: 15px;
+      background-color: white;
+      border-top: 1px solid #ddd;
+    }
+
+    body.dark-mode .input-container {
+      background-color: #1e1e1e; /* Dark Mode Input Background */
+      border-color: #444; /* Dark Mode Input Border */
+    }
+
+    .input-container input {
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 20px;
+      border: 1px solid #ddd;
+    }
+
+    body.dark-mode .input-container input {
+      background-color: #333; /* Dark Mode Input Field */
+      color: white;
+      border-color: #555;
+    }
+
+    .send-btn {
+      background-color: #f59609;
+      color: white;
+      padding: 10px;
+      border-radius: 50%;
+      border: none;
+      margin-left: 10px;
+      cursor: pointer;
+    }
+
+    .send-btn:hover {
+      background-color: #128C7E;
+    }
+    /* Style for the Proceed button in chat */
+.proceed-btn {
+  background-color: #d3932b; /* Green button */
+  color: white;
+  padding: 8px 16px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  margin-top: 10px;
+  width: auto;
+  transition: background-color 0.3s ease;
+}
+
+.proceed-btn:hover {
+  background-color: #45a049; /* Darker green on hover */
+}
+
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>College Mantra</h1>
+    <div class="menu">⋮</div>
+    <div class="popup">
+      <button id="clearChatBtn">Clear Chat</button>
+      <button id="toggleThemeBtn">Change Theme</button>
+      <button id="helpBtn">Help</button>
+    </div>
+  </div>
+
+  <div class="chat-container" id="chatContainer">
+    <p><b><i>Just type anything and get to know everything !</b> </p>
+  </div>
+
+  <div class="input-container">
+    <input type="text" id="userInput" placeholder="Type a message..." onkeydown="if(event.key === 'Enter'){ sendMessage(); }">
+    <button class="send-btn" onclick="sendMessage()">➤</button>
+  </div>
+
+  <script>
+    const popup = document.querySelector('.popup');
+    const menu = document.querySelector('.menu');
+    const body = document.body;
+
+    // Show or hide the popup when the menu button is clicked
+    menu.onclick = function(event) {
+      event.stopPropagation(); // Prevent click from propagating
+      popup.style.display = popup.style.display === 'blok' ? 'none' : 'block';
+    };
+
+    // Hide the popup if the user clicks anywhere else
+    document.body.onclick = function() {
+      popup.style.display = 'none';
+    };
+
+    // Prevent hiding the popup when clicking inside it
+    popup.onclick = function(event) {
+      event.stopPropagation();
+    };
+
+    // Clear chat functionality
+    document.querySelector('#clearChatBtn').onclick = function() {
+      document.getElementById('chatContainer').innerHTML = ''; // Clear chat
+      popup.style.display = 'none'; // Hide popup
+    };
+
+    document.getElementById('helpBtn').addEventListener('click', function() {
+            window.location.href = 'collegeMantraHelp.html';
+        });
+
+    // Toggle dark mode functionality
+    document.querySelector('#toggleThemeBtn').onclick = function() {
+      body.classList.toggle('dark-mode'); // Toggle the dark-mode class
+      popup.style.display = 'none'; // Hide popup
+    };
+
+    function sendMessage() {
+      var userInput = document.getElementById('userInput').value.toLowerCase();
+      var chatContainer = document.getElementById('chatContainer');
+
+      if (userInput.trim() !== "") {
+        var userMessage = document.createElement('div');
+        userMessage.classList.add('message', 'sent');
+        userMessage.textContent = userInput;
+        chatContainer.appendChild(userMessage);
+
+        document.getElementById('userInput').value = "";
+
+        setTimeout(function() {
+          var botMessage = document.createElement('div');
+                    // Check for specific locations and provide a "Proceed" button for more info
+    if (userInput.includes("girls hostel") || userInput.includes("hostel girls")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "To know about the girls hostel, click on the proceed button.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Proceed";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("girlshostel.html", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+} else if (userInput.includes("girls washroom") || userInput.includes("girls restroom") || userInput.includes("girls toilet") || userInput.includes("ladies")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "To know about the girls washroom, click on the proceed button.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Proceed";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("girlswashroom.html", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+} else if (userInput.includes("canteen") || userInput.includes("cafe")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "To know about the canteen, click on the proceed button.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Proceed";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("canteen.html", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+} else if (userInput.includes("library")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "To know about the library, click on the proceed button.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Proceed";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("library.html", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+} else if (userInput.includes("ground")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "To know about the ground, click on the proceed button.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Proceed";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("ground.html", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+} else if (userInput.includes("main block seminar hall") || userInput.includes("seminar hall of main block")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "To know about the seminar hall in the main block, click on the proceed button.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Proceed";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("mainblockseminarhall.html", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+} else if (userInput.includes("physics")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "To know about the physics lab, click on the proceed button.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Proceed";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("physics lab.html", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+} else if (userInput.includes("principal room") || userInput.includes("principal cabin")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "To know about the principal's room, click on the proceed button.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Proceed";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("principalroom.html", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+} else if (userInput.includes("sports and ncc room") || userInput.includes("sports room") || userInput.includes("ncc room")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "To know about the sports and NCC room, click on the proceed button.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Proceed";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("sports and ncc room.html", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+} else if (userInput.includes("water")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "To know about the water facility, click on the proceed button.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Proceed";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("waterfacility.html", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+} else if (userInput.includes("basket")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "To know about the basketball area, click on the proceed button.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Proceed";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("basketball.html", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+} else if (userInput.includes("b block seminar hall")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "To know about the B block seminar hall, click on the proceed button.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Proceed";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("bblockseminarhall.html", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+} 
+else if (userInput.includes("b-block")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "To know about the B block, click on the proceed button.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Proceed";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("bblock.html", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+else if (userInput.includes("c block")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "To know about the c block, click on the proceed button.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Proceed";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("cblock.html", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}  else if (userInput.includes("boys washroom") || userInput.includes("boys restroom") || userInput.includes("boys toilet") || userInput.includes("gents")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "To know about the boys washroom, click on the proceed button.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Proceed";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("boys washroom.html", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+} else if (userInput.includes("boys hostel") || userInput.includes("hostel boys")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "To know about the boys hostel, click on the proceed button.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Proceed";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("boyshostel.html", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+} else if (userInput.includes("chemistry")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "To know about the chemistry lab, click on the proceed button.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Proceed";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("chemistrylab.html", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+} else if (userInput.includes("computer lab")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "To know about the computer lab, click on the proceed button.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Proceed";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("computer labs.html", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+} else if (userInput.includes("eee lab") || userInput.includes("ece lab") || userInput.includes("electrical lab") || userInput.includes("electronics lab") || userInput.includes("beee")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "To know about the EEE/ECE lab, click on the proceed button.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Proceed";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("eee lab.html", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+} else if (userInput.includes("exam section") ||userInput.includes("examination section") || userInput.includes("exam centre") || userInput.includes("hall ticket")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "To know about the exam section, click on the proceed button.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Proceed";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("examsection.html", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+} else if (userInput.includes("fee payment") || userInput.includes("bus fee") || userInput.includes("miscellaneous fee") || userInput.includes("tuition fee") || userInput.includes("college fee")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "To know about the fee payment section, click on the proceed button.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Proceed";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("feepayment.html", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+else if (userInput == "hello" || userInput == "hi" || userInput == "hey") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Hi, how can I help you?";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "hii" || userInput == "hiya" || userInput == "hey there") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Hello, how may I assist you?";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "thank you" || userInput == "thanks") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "You're welcome! Let me know if you need anything else.";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "good morning" || userInput == "goodmorning") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Good morning! Let me know if you need anything.";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "good afternoon" || userInput == "good after noon"|| userInput=="goodafternoon") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Good After noon! Let me know if you need anything.";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "good evening" || userInput=="goodevening") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Good Evening! Let me know if you need anything.";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "good night" || userInput == "goodnight") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Good Night! Let me know if you need anything.";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "what can you do") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can assist you with information, answer general queries, and help with SRIT-related topics.";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "what's your purpose" || userInput == "what do you do") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I’m here to assist you with any questions and help you navigate through SRIT-related information.";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "how are you") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I’m doing great, thanks for asking! How about you?";
+  chatContainer.appendChild(botMessage);
+}
+else if (userInput.includes("college name")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Srinivasa Ramanujan Institute of Technology";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "how do you do") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I’m doing well, thanks! How can I help you?";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "contact number" || userInput == "phone number") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "You can reach us at: tel:9515611111";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "bye" || userInput == "goodbye" || userInput == "see you") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Okay! Will meet soon. Have a great day!";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "help" || userInput == "assist me") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I'm here to help! Just let me know what you need.";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "what can I ask you") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Feel free to ask about anything related to SRIT or general information!";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "do you have a team") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Yes, I was created by four students from the CSE department.";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "tell me a joke") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Why don't skeletons fight each other? They don't have the guts! 😄";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "tell me a quote") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "“The only way to do great work is to love what you do.” – Steve Jobs";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "how to contact support" || userInput == "contact support") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "You can contact support through the contact number: tel:9515611111 or visit the helpdesk.";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "what is your favorite color") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I don't have a favorite color, but I love all colors! 🌈";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "how do you work") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I work by analyzing your queries and responding with the best possible answers based on the information I have.";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "who created you") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I was created by students from SRIT’s CSE department.";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "what is your purpose in life") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "My purpose is to assist you, make information accessible, and make your experience better.";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "do you have a mind") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I don't have a mind, but I process information to assist you in the best way possible.";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "can you think") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I don’t think like humans, but I’m designed to answer your queries as accurately as possible.";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "are you human") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "No, I'm an AI assistant created by humans to help you with your queries.";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "what is your favorite food") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I don't eat, but I hear pizza is quite popular! 🍕";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "what is your favorite book") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I don’t read books, but I do love learning from all kinds of knowledge!📚";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "do you have emotions") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I don't have emotions, but I’m designed to respond with kindness and help whenever you need.";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "are you always available") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Yes, I am available 24/7! Just ask whenever you need help.";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "tell me about yourself") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I am College Mantra, an AI assistant built to help you with SRIT-related queries and make information easy to access!";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "how old are you") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I don't age, but I was created to help you right now and always!";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "is this a joke") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "It depends on how you look at it! 😄 I'm always happy to answer your questions.";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "why are you here") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I am here to assist you and make your experience better. Feel free to ask me anything.";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "can you answer any question") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I'll try my best to answer any question you have! Ask away!";
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput == "what is the meaning of life") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "The meaning of life is different for everyone! For me, it’s to assist and help you with anything you need.";
+  chatContainer.appendChild(botMessage);
+}
+else if (userInput == "who are you") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Hello!, I'm College Mantra how can I help you";
+  chatContainer.appendChild(botMessage);
+}
+else if (userInput == "h and s hod" || userInput == "gurusiddappa" || userInput == "guru siddappa" || userInput == "who is h and s" || userInput == "who is gurusiddappa" || userInput == "who is guru siddappa" || userInput == "who is h&s" || userInput == "who is h & s" || userInput == "who is humanities and sciences hod" || userInput == "who is the h and s hod" || userInput == "who is the gurusiddappa" || userInput == "who is the guru siddappa" || userInput == "who is the h&s" || userInput == "who is the h & s" || userInput == "who is the humanities and sciences hod") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "You can find information about Guru Siddappa at the following link: <a href='https://sites.google.com/view/gurusiddappa/home' target='_blank'>Guru Siddappa's Page</a>";
+  chatContainer.appendChild(botMessage);
+} else if (userInput == "where is civil hod cabin" || userInput == "where is the civil hod cabin" || userInput == "where is civil room" || userInput == "where is the civil room") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "The Civil HOD Cabin is located in the Civil Department. You can visit the page here: <a href='civil dept.html' target='_blank'>Civil Department</a>";
+  chatContainer.appendChild(botMessage);
+} else if (userInput == "where is csd and csm hod cabin" || userInput == "where is the csd and csm hod cabin" || userInput == "where is csd hod cabin" || userInput == "where is the csd hod cabin" || userInput == "where is csm hod cabin" || userInput == "where is the csm hod cabin" || userInput == "where is hod cabin of csm" || userInput == "where is the hod cabin of csm" || userInput == "where is hod cabin of csd" || userInput == "where is the hod cabin of csd" || userInput == "where is hod cabin of csd and csm" || userInput == "where is the hod cabin of csd and csm") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "The CSD and CSM HOD Cabin is located in the CSD and CSM Department. You can visit the page here: <a href='csd and csm dept.html' target='_blank'>CSD and CSM Department</a>";
+  chatContainer.appendChild(botMessage);
+} else if (userInput == "where is cse hod cabin" || userInput == "where is the cse hod cabin" || userInput == "where is hod cabin of cse" || userInput == "where is the hod cabin of cse") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "The CSE HOD Cabin is located in the CSE Department. You can visit the page here: <a href='csehodcabin.html' target='_blank'>CSE Department</a>";
+  chatContainer.appendChild(botMessage);
+} else if (userInput == "where is ece hod cabin" || userInput == "where is the ece hod cabin" || userInput == "where is hod cabin of ece" || userInput == "where is the hod cabin of ece") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "The ECE HOD Cabin is located in the ECE Department. You can visit the page here: <a href='ece dept.html' target='_blank'>ECE Department</a>";
+  chatContainer.appendChild(botMessage);
+}
+else if (userInput == "who is mechanical hod") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "The Mech HOD is L. Vamsi Krishna. You can visit the page here: <a href='https://sites.google.com/view/vamsi-krishna-reddy/Da3hmFsErPfD_mu_TrCZZ/p/1oXU3D0xWflPL3NWkr2CTVw0EHyWaYgCV/edit' target='_blank'>Hod's page</a>";
+  chatContainer.appendChild(botMessage);
+}
+else if (userInput == "who is H and S hod"||userInput == "who is h and s hod") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "The H and S HOD is Dr. G. GuruSidppa. You can visit the page here: <a href='https://sites.google.com/view/gurusiddappa/home' target='_blank'>Hod's page</a>";
+  chatContainer.appendChild(botMessage);
+} else if (userInput == "where is eee hod cabin" || userInput == "where is the eee hod cabin" || userInput == "where is hod cabin of eee" || userInput == "where is the hod cabin of eee") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "The EEE HOD Cabin is located in the EEE Department. You can visit the page here: <a href='eee dept.html' target='_blank'>EEE Department</a>";
+  chatContainer.appendChild(botMessage);
+} else if (userInput == "where is h and s hod cabin" || userInput == "where is the h and s hod cabin" || userInput == "where is h & s hod cabin" || userInput == "where is the h & s hod cabin" || userInput == "where is hod cabin of h and s" || userInput == "where is the hod cabin of h and s" || userInput == "where is hod cabin of h & s" || userInput == "where is the hod cabin of h & s") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "The H and S HOD Cabin is located in the H and S Department. You can visit the page here: <a href='h an s hod cabin.html' target='_blank'>H and S Department</a>";
+  chatContainer.appendChild(botMessage);
+} else if (userInput == "where is mechanical hod cabin" || userInput == "where is the mechanical hod cabin" || userInput == "where is hod cabin of mechanical" || userInput == "where is the hod cabin of mechanical") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "The Mechanical HOD Cabin is located in the Mechanical Department. You can visit the page here: <a href='mechanical hod cabin.html' target='_blank'>Mechanical Department</a>";
+  chatContainer.appendChild(botMessage);
+} else if (userInput == "where can I find civil hod cabin" || userInput == "where can I find civil room") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "The Civil HOD Cabin is located in the Civil Department. You can visit the page here: <a href='civil dept.html' target='_blank'>Civil Department</a>";
+  chatContainer.appendChild(botMessage);
+} else if (userInput == "where can I find csd and csm hod cabin" || userInput == "where can I find csd hod cabin" || userInput == "where can I find csm hod cabin" || userInput == "where can I find hod cabin of csm" || userInput == "where can I find hod cabin of csd" || userInput == "where can I find hod cabin of csd and csm") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "The CSD and CSM HOD Cabin is located in the CSD and CSM Department. You can visit the page here: <a href='csd and csm dept.html' target='_blank'>CSD and CSM Department</a>";
+  chatContainer.appendChild(botMessage);
+} else if (userInput == "where can I find cse hod cabin" || userInput == "where can I find hod cabin of cse") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "The CSE HOD Cabin is located in the CSE Department. You can visit the page here: <a href='csehodcabin.html' target='_blank'>CSE Department</a>";
+  chatContainer.appendChild(botMessage);
+} else if (userInput == "where can I find ece hod cabin" || userInput == "where can I find hod cabin of ece") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "The ECE HOD Cabin is located in the ECE Department. You can visit the page here: <a href='ece dept.html' target='_blank'>ECE Department</a>";
+  chatContainer.appendChild(botMessage);
+} else if (userInput == "where can I find eee hod cabin" || userInput == "where can I find hod cabin of eee") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "The EEE HOD Cabin is located in the EEE Department. You can visit the page here: <a href='eee dept.html' target='_blank'>EEE Department</a>";
+  chatContainer.appendChild(botMessage);
+} else if (userInput == "where can I find h and s hod cabin" || userInput == "where can I find h & s hod cabin" || userInput == "where can I find hod cabin of h and s" || userInput == "where can I find hod cabin of h & s") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "The H and S HOD Cabin is located in the H and S Department. You can visit the page here: <a href='h an s hod cabin.html' target='_blank'>H and S Department</a>";
+  chatContainer.appendChild(botMessage);
+} else if (userInput == "where can I find mechanical hod cabin" || userInput == "where can I find hod cabin of mechanical") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "The Mechanical HOD Cabin is located in the Mechanical Department. You can visit the page here: <a href='mechanical hod cabin.html' target='_blank'>Mechanical Department</a>";
+  chatContainer.appendChild(botMessage);
+} else if (userInput == "where can i find civil hod cabin" || userInput == "where can i find civil room") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "The Civil HOD Cabin is located in the Civil Department. You can visit the page here: <a href='civil dept.html' target='_blank'>Civil Department</a>";
+  chatContainer.appendChild(botMessage);
+} else if (userInput == "where can i find csd and csm hod cabin" || userInput == "where can i find csd hod cabin" || userInput == "where can i find csm hod cabin" || userInput == "where can i find hod cabin of csm" || userInput == "where can i find hod cabin of csd" || userInput == "where can i find hod cabin of csd and csm") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "The CSD and CSM HOD Cabin is located in the CSD and CSM Department. You can visit the page here: <a href='csd and csm dept.html' target='_blank'>CSD and CSM Department</a>";
+  chatContainer.appendChild(botMessage);
+} else if (userInput == "where can i find cse hod cabin" || userInput == "where can i find hod cabin of cse") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "The CSE HOD Cabin is located in the CSE Department. You can visit the page here: <a href='csehodcabin.html' target='_blank'>CSE Department</a>";
+  chatContainer.appendChild(botMessage);
+} else if (userInput == "where can i find ece hod cabin" || userInput == "where can i find hod cabin of ece") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "The ECE HOD Cabin is located in the ECE Department. You can visit the page here: <a href='ece dept.html' target='_blank'>ECE Department</a>";
+  chatContainer.appendChild(botMessage);
+} else if (userInput == "where can i find eee hod cabin" || userInput == "where can i find hod cabin of eee") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "The EEE HOD Cabin is located in the EEE Department. You can visit the page here: <a href='eee dept.html' target='_blank'>EEE Department</a>";
+  chatContainer.appendChild(botMessage);
+}
+else if (userInput == "where can i find h and s hod cabin" || userInput == "where can i find h & s hod cabin" || userInput == "where can i find hod cabin of h and s" || userInput == "where can i find hod cabin of h & s") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "The H and S HOD Cabin is located in the H and S Department. You can visit the page here: <a href='h an s hod cabin.html' target='_blank'>H and S Department</a>";
+  chatContainer.appendChild(botMessage);
+} else if (userInput == "where can i find mechanical hod cabin" || userInput == "where can i find hod cabin of mechanical") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "The Mechanical HOD Cabin is located in the Mechanical Department. You can visit the page here: <a href='mechanical hod cabin.html' target='_blank'>Mechanical Department</a>";
+  chatContainer.appendChild(botMessage);
+} else if (userInput == "where is the civil hod cabin" || userInput == "where is civil hod cabin") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "The Civil HOD Cabin is located in the Civil Department. You can visit the page here: <a href='civil dept.html' target='_blank'>Civil Department</a>";
+  chatContainer.appendChild(botMessage);
+} else if (userInput == "can you answer any question") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I'll try my best to answer any question you have! Ask away!";
+  chatContainer.appendChild(botMessage);
+} else if (userInput == "who are you") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I am your helpful assistant, here to answer your questions and assist with anything you need!";
+  chatContainer.appendChild(botMessage);
+} else if (userInput == "hello" || userInput == "hi" || userInput == "hey") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Hello! How can I help you today?";
+  chatContainer.appendChild(botMessage);
+} else if (userInput == "goodbye" || userInput == "bye") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Goodbye! Have a great day!";
+  chatContainer.appendChild(botMessage);
+} else if (userInput == "help" || userInput == "can you help me") {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Of course! Let me know what you need help with.";
+  chatContainer.appendChild(botMessage);
+}
+else if (userInput.includes("whatsapp")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can open WhatsApp for you.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Open WhatsApp";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("whatsapp://", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+} 
+
+else if (userInput.includes("settings")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the settings page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Open Settings";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("ms-settings://", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("college website") || userInput.includes("college portal") || userInput.includes("srit website") || userInput.includes("srit college website") || userInput.includes("home page")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the college website.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to SRIT Website";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("exam portal") || userInput.includes("exam website") || userInput.includes("results")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the exam portal.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Exam Portal";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://sritexams.in/eportal/Login.aspx", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("faculty ecap") || userInput.includes("faculty login") || userInput.includes("employee login")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the faculty ecap login page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Faculty Login";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("http://webprosindia.com/srit/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("student ecap") || userInput.includes("student login")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the student ecap login page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Student Login";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("http://webprosindia.com/sritstudent/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("alumni")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the alumni page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Alumni Page";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("http://alumni.srit.ac.in/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("contact")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the contact us page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Contact Us";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/contact-us/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("vision and mission")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can show you the vision and mission of the college.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Vision and Mission";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/vision-mission/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+// Continue the rest similarly
+else if (userInput.includes("course")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can show you the courses offered at SRIT.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Courses Offered";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/courses-offered/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("admission procedure") || userInput.includes("admission")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the admission procedure page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Admission Procedure";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/admission-procedure/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("fee structure")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can show you the fee structure.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Fee Structure";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/fee-structure/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("academic calender") || userInput.includes("open academic calenders")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can show you the academic calendar.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Academic Calendar";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/academic-calendars/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("academic regulation")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can show you the academic regulations.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Academic Regulations";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/academic-regulations/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("cse department") || userInput.includes("computer science") || userInput.includes("computer science and engineering") || userInput.includes("cse details")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the Computer Science Engineering department.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to CSE Department";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/computer-science-engineering-2/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("csm department") || userInput.includes("csm details") || userInput.includes("artificial intelligence") || userInput.includes("machine learning") || userInput.includes("aiml") || userInput.includes("ai and ml")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the Artificial Intelligence & Machine Learning department.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to CSM Department";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/cse-artificial-intelligence-machine-learning-2/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("csd department") || userInput.includes("csd details") || userInput.includes("computer science in data science engineering") || userInput.includes("data science") || userInput.includes("ds")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the Computer Science in Data Science Engineering department.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to CSD Department";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/cse-data-science/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("ece department") || userInput.includes("ece details") || userInput.includes("electrical and communication engineering") || userInput.includes("electronics and communication")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the Electronics & Communication Engineering department.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to ECE Department";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/electronics-communication-engineering-2/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("eee department") || userInput.includes("eee details") || userInput.includes("electrical and electronics engineering") || userInput.includes("electrical") || userInput.includes("electronics")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the Electrical & Electronics Engineering department.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to EEE Department";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/eee-2/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("mec department") || userInput.includes("mec details") || userInput.includes("mechanical engineering") || userInput.includes("mech details") || userInput.includes("mechanical") || userInput.includes("mech department")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the Mechanical Engineering department.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to MEC Department";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/mec-2/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("civil department") || userInput.includes("civil details") || userInput.includes("civil engineering")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the Civil Engineering department.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Civil Department";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/civil-engineering-2/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("h&s") || userInput.includes("humanities") || userInput.includes("sciences") || userInput.includes("h and s")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the Humanities & Sciences department.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to H&S Department";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/humanities-science-2/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("chairman's club") || userInput.includes("chairmans")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the Chairman's Club page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Chairman's Club";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/chairmansclub/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+else if (userInput.includes("iei") || userInput.includes("institute of engineers")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the Institute of Engineers page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to IEI";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/iei/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("internet society")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the Internet Society page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Internet Society";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/internet-society/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("iete") || userInput.includes("institute of electronics and telecommunication engineers")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the Institute of Electronics and Telecommunication Engineers page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to IETE";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/iete/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("ici") || userInput.includes("indian concrete institute")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the Indian Concrete Institute page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to ICI";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/ici/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("iste") || userInput.includes("indian society for technical education")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the Indian Society for Technical Education page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to ISTE";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/iste/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("sae") || userInput.includes("society of automotive engineering")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the Society of Automotive Engineering page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to SAE";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/sae/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("toastmasters international club") || userInput.includes("toastmasters") || userInput.includes("toast masters")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the Toastmasters International Club page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Toastmasters International Club";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/toast-masters-international-club/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("english language club")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the English Language Club page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to English Language Club";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/english-language-club/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("ndli") || userInput.includes("national digital library of india club")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the National Digital Library of India Club page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to NDLI Club";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/ndli-club/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("programmers") || userInput.includes("programmers's")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the Programmers Club page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Programmers Club";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/programmers-club/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("notifications and results") || userInput.includes("notifications")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the Notifications page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Notifications";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/notifications/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("e-services") || userInput.includes("exam portal") || userInput.includes("online") || userInput.includes("pay")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the E-Services page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to E-Services";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://sritexams.in/eportal/Login.aspx", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("previous question papers") || userInput.includes("question papers")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the Previous Question Papers page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Previous Question Papers";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/previous-question-papers/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("exam committee") || userInput.includes("examination commitee")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the Exam Committee page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Exam Committee";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/exam-committee/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("results committee")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the Results Committee page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Results Committee";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/results-committee/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("evaluation") || userInput.includes("evaluate")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can show you the evaluation procedure.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Evaluation Procedure";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/evaluation-procedure-2/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("malpractice")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can show you the malpractice rules.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Malpractice Rules";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/malpractice-rules/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("placement committee") || userInput.includes("placement team") || userInput.includes("placement coordinator") || userInput.includes("placement co-ordinator")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the Placement Committee page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Placement Committee";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/training-placement-team-members/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("training program") || userInput.includes("training") || userInput.includes("training and placement")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can show you the training programs.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Training Program";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/training-program/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("campus drive") || userInput.includes("drive")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the campus drive page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Campus Drive";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/campus-drives/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("placement information") || userInput.includes("placement")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can show you the placement information.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Placement Information";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/training-placement-statistics/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("ncc") || userInput.includes("national cadet corps")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the National Cadet Corps page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to NCC";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/national-cadet-corps/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("nss") || userInput.includes("national service scheme")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the National Service Scheme page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to NSS";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/national-service-scheme/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("rotary club") || userInput.includes("rotract")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the Rotary Club page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Rotary Club";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/rotaract-club/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+else if (userInput.includes("instagram account") || userInput.includes("college instagram")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the College Instagram page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Instagram";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.instagram.com/sritatp/", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("twitter account") || userInput.includes("college twitter")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the College Twitter page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Twitter";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://x.com/sritatp/?mx=2", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("facebook account") || userInput.includes("college facebook")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the College Facebook page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Facebook";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.facebook.com/@sritatp/?ref=embed_page", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("youtube account") || userInput.includes("college youtube")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the College YouTube channel.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to YouTube";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.youtube.com/channel/UC_J4p9Xovt4UGP6ddPzr42g", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("linkedin account") || userInput.includes("college linkedin")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the College LinkedIn page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to LinkedIn";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.linkedin.com/school/sritatp/", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+else if (userInput.includes("chairperson")||userInput.includes("chair person")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the Chairperson's page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Chairperson's Page";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/about-chairperson/", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("secretary") || userInput.includes("founder")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the Founder Secretary's page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Founder Secretary's Page";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/about-founder-secretary/", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("principal")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the Principal's page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Principal's Page";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/principal/", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("governing council")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the Governing Council's page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Governing Council's Page";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/governing-council/", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("academic council")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the Academic Council's page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Academic Council's Page";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/academic-council/", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("newsletter")||userInput.includes("news letter")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the Newsletters page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Newsletters Page";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/news-letters/", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+else if (userInput.includes("cse hod") || userInput.includes("veera prakash") || userInput.includes("prakash")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of CSE HOD, Veera Prakash.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to CSE HOD Page";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://sites.google.com/view/pvprakash/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("csm and csd hod") || userInput.includes("csm hod") || userInput.includes("csd hod") || userInput.includes("chitralingappa") || userInput.includes("chitralingapa")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of CSM and CSD HOD, Dr. Chitralingappa.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to CSM & CSD HOD Page";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://sites.google.com/view/drpcl/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("ece hod") || userInput.includes("ravichandra") || userInput.includes("ravi chandra")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of ECE HOD, Dr. Ravi Chandra.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to ECE HOD Page";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://sites.google.com/view/drmlravichandra/", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("eee hod") || userInput.includes("meerimatha") || userInput.includes("merimatha") || userInput.includes("meeri matha") || userInput.includes("meri maatha") || userInput.includes("meri matha")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of EEE HOD, Dr. Meerimatha.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to EEE HOD Page";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://sites.google.com/view/meerimathaeee/home?authuser=0", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("civil hod") || userInput.includes("venkatareddy") || userInput.includes("venkata reddy")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of Civil HOD, Dr. Venkata Reddy.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Civil HOD Page";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://sites.google.com/srit.ac.in/drtcvenkatareddy/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("mech hod") || userInput.includes("mec hod") || userInput.includes("vamsi krishna") || userInput.includes("vamsikrishnareddy") || userInput.includes("vamsikrishna")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of Mechanical HOD, Vamsi Krishna Reddy.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Mechanical HOD Page";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://sites.google.com/view/vamsi-krishna-reddy/home?authuser=0", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+else if (userInput.includes("rajesh babu")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of Rajesh Babu.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Rajesh Babu's Page";
+  proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+  proceedButton.onclick = function() {
+    window.open("https://sites.google.com/view/rajeshbabu/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("qubeb")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of Qubeb.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Qubeb's Page";
+  proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+  proceedButton.onclick = function() {
+    window.open("https://sites.google.com/srit.ac.in/smpqubebmtechphd/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+
+else if (userInput.includes("jagadeeswara prasad")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of Jagadeeswara Prasad.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Jagadeeswara Prasad's Page";
+  proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+  proceedButton.onclick = function() {
+    window.open("https://sites.google.com/srit.ac.in/jagadeeswaraprasadpv/about", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("praneel kumar")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of Praneel Kumar.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Praneel Kumar's Page";
+  proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+  proceedButton.onclick = function() {
+    window.open("https://sites.google.com/srit.ac.in/praneelkumarperuru/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("lakshmi narayana reddy")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of Lakshmi Narayana Reddy.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Lakshmi Narayana Reddy's Page";
+  proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+  proceedButton.onclick = function() {
+    window.open("https://sites.google.com/view/dlnreddy", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("nazeer shaik") || userInput.includes("nazeer")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of Nazeer Shaik.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Nazeer Shaik's Page";
+  proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+  proceedButton.onclick = function() {
+    window.open("https://sites.google.com/view/nazeershaik/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("sudha gowd")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of Sudha Gowd.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Sudha Gowd's Page";
+  proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+  proceedButton.onclick = function() {
+    window.open("https://sites.google.com/srit.ac.in/sudha/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("shajahan")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of Shajahan.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Shajahan's Page";
+  proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+  proceedButton.onclick = function() {
+    window.open("https://sites.google.com/srit.ac.in/pagidipalle-shajahan/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("shirisha")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of Shirisha.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Shirisha's Page";
+  proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+  proceedButton.onclick = function() {
+    window.open("https://sites.google.com/srit.ac.in/sirisha-p", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+else if (userInput.includes("chitralingappa")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Chitralingappa's Page";
+  proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+  proceedButton.onclick = function() {
+    window.open("https://sites.google.com/view/drpcl/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("sudhakar")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Page not available.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Try Again Later";
+  proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+  proceedButton.onclick = function() {
+    alert("The page for Sudhakar is currently unavailable.");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("nagaprabhakar") || userInput.includes("naga prabhakar")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Page not available.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Try Again Later";
+  proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+  proceedButton.onclick = function() {
+    alert("The page for Nagaprabhakar is currently unavailable.");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+else if (userInput.includes("lakshminatha reddy")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of Lakshminatha Reddy.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Lakshminatha Reddy's Page";
+  proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class
+  proceedButton.onclick = function() {
+    window.open("https://sites.google.com/view/clnreddy/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("ranjit reddy") || userInput.includes("ranjit") || userInput.includes("ranjith reddy")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of Ranjit Reddy.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Ranjit Reddy's Page";
+  proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class
+  proceedButton.onclick = function() {
+    window.open("https://sites.google.com/view/ranjit", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("venkata naga jayudu")||userInput.includes("jayudu")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of Venkata Naga Jayudu.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Venkata Naga Jayudu's Page";
+  proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class
+  proceedButton.onclick = function() {
+    window.open("https://sites.google.com/prod/view/tvnjayudu", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("hemanth kumar yadav") || userInput.includes("hemanth kumar") || userInput.includes("hemanth")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of Hemanth Kumar Yadav.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Hemanth Kumar Yadav's Page";
+  proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class
+  proceedButton.onclick = function() {
+    window.open("https://sites.google.com/srit.ac.in/hemanthkumaryadav-cse/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("sasikala")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of Sasikala.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Sasikala's Page";
+  proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class
+  proceedButton.onclick = function() {
+    window.open("https://sites.google.com/view/drcsasikala/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("hari chandana") || userInput.includes("harichandana")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of Hari Chandana.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Hari Chandana's Page";
+  proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class
+  proceedButton.onclick = function() {
+    window.open("https://sites.google.com/srit.ac.in/harichandana/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("suman")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of Suman.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Suman's Page";
+  proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class
+  proceedButton.onclick = function() {
+    window.open("https://sites.google.com/srit.ac.in/ssuman/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+else if (userInput.includes("narasimhulu")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of Narasimhulu.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Narasimhulu's Page";
+  proceedButton.classList.add('proceed-btn');
+  proceedButton.onclick = function() {
+    window.open("https://sites.google.com/view/mr-m-narasimhulu/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("chinna pullaiah") || userInput.includes("china pullaiah")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of Chinna Pullaiah.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Chinna Pullaiah's Page";
+  proceedButton.classList.add('proceed-btn');
+  proceedButton.onclick = function() {
+    window.open("https://sites.google.com/srit.ac.in/gandla-chinna-pullaiah", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("sudheer kumar") || userInput.includes("sudheer")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of Sudheer Kumar.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Sudheer Kumar's Page";
+  proceedButton.classList.add('proceed-btn');
+  proceedButton.onclick = function() {
+    window.open("https://sites.google.com/srit.ac.in/sudheerkumar/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("kavitha")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of Kavitha.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Kavitha's Page";
+  proceedButton.classList.add('proceed-btn');
+  proceedButton.onclick = function() {
+    window.open("https://sites.google.com/srit.ac.in/kavitha", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("soumya") || userInput.includes("sowmya")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of Soumya.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Soumya's Page";
+  proceedButton.classList.add('proceed-btn');
+  proceedButton.onclick = function() {
+    window.open("https://sites.google.com/srit.ac.in/soumya-madduru/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("sreedhar")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of Sreedhar.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Sreedhar's Page";
+  proceedButton.classList.add('proceed-btn');
+  proceedButton.onclick = function() {
+    window.open("https://sites.google.com/srit.ac.in/sreedhar/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("shabana")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of Shabana.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Shabana's Page";
+  proceedButton.classList.add('proceed-btn');
+  proceedButton.onclick = function() {
+    window.open("https://sites.google.com/srit.ac.in/gshabana", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("bala ankanna")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of Bala Ankanna.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Bala Ankanna's Page";
+  proceedButton.classList.add('proceed-btn');
+  proceedButton.onclick = function() {
+    window.open("https://sites.google.com/srit.ac.in/abalaankanna", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("erriswami")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of Erriswami.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Erriswami's Page";
+  proceedButton.classList.add('proceed-btn');
+  proceedButton.onclick = function() {
+    window.open("https://sites.google.com/srit.ac.in/swamy/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("kondanna")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of Kondanna.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Kondanna's Page";
+  proceedButton.classList.add('proceed-btn');
+  proceedButton.onclick = function() {
+    window.open("https://sites.google.com/view/kondanna/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+else if (userInput.includes("kishore")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of Dr. D. Sai Chaitanya Kishore";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Page";
+  proceedButton.classList.add('proceed-btn');
+  proceedButton.onclick = function() {
+    window.open("https://sites.google.com/srit.ac.in/me-dsck/", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("venkatesh")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of Venkatesh.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Venkatesh's Page";
+  proceedButton.classList.add('proceed-btn');
+  proceedButton.onclick = function() {
+    window.open("https://sites.google.com/view/kvenkatesh/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("college details") || userInput.includes("about college")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I will give you about college";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "About college";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://drive.google.com/file/d/1HminceY6KXEMxH5SqKnVedr1GRyviuf8/view?usp=sharing", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+else if (userInput.includes("eamcet") || userInput.includes("eapcet")||userInput.includes("previous year rank")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I will give you details about previous ranks";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "About previous ranks";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://www.srit.ac.in/previousranks/", "_blank"); // Open in a new window
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+else if (userInput.includes("r20 course structure")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Here is the course structure for R20.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "View R20 Course Structure";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://drive.google.com/file/d/1r-Pqj9dzZFOgE0iKDqoNouLeiPDu53-g/view?usp%3Dshare_link", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("r19 course structure")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Here is the course structure for R19.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "View R19 Course Structure";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://drive.google.com/file/d/18oSbtYtWxG4Z2JHwqq6bcOs2zxNgTvHp/view?usp%3Ddrive_link", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("r20 syllabus")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Here is the syllabus for R20.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "View R20 Syllabus";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://drive.google.com/file/d/1CBJzGrNsfJlMvuxAb3Oci1p8cTT-I2-v/view?usp%3Ddrive_link", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+else if (userInput.includes("r20")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Here is the R20 document.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "View R20 Document";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://drive.google.com/file/d/1sz-IjJAZeRjpAyVm5w9JYcdJ2umT6IRn/view?usp%3Ddrive_link", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("r23")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Here is the R23 document.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "View R23 Document";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://drive.google.com/file/d/11jU0WSjOXgqbMZk4JEBbQxHmvCaaam6N/view?usp%3Ddrive_link", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("r15")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Here is the R15 document.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "View R15 Document";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://drive.google.com/file/d/1QKlBHXxonJiKiO2GC-4JhtJbmo5p9m7o/view?usp%3Dsharing", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("r19")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Here is the R19 document.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "View R19 Document";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://drive.google.com/file/d/1ylmJxTKFh7FcX9sc0BRk9Y38Ri_Y_Bsm/view?usp%3Dsharing", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("r20 structure")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Here is the course structure for R20.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "View R20 Course Structure";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://drive.google.com/file/d/1r-Pqj9dzZFOgE0iKDqoNouLeiPDu53-g/view?usp%3Dshare_link", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("r19 structure")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Here is the course structure for R19.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "View R19 Course Structure";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://drive.google.com/file/d/18oSbtYtWxG4Z2JHwqq6bcOs2zxNgTvHp/view?usp%3Ddrive_link", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+else if (userInput.includes("manjeera")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Here is the link for Manjeera Patil.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "View Manjeera Patil's Page";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://sites.google.com/view/manjeerapatil", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("kamakshamma")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Here is the link for Kamakshamma.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "View Kamakshamma's Page";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://sites.google.com/srit.ac.in/v-kamakshamma/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("ganesh")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Here is the link for Ganesh.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "View Ganesh's Page";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://sites.google.com/srit.ac.in/ganeshcse/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("jeevana jyothi")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Here is the link for Jeevana Jyothi.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "View Jeevana Jyothi's Page";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://sites.google.com/srit.ac.in/jeevana-jyothi-d/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("vijay bhaskar reddy") || userInput.includes("vijay bhaskar")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Here is the link for Vijay Bhaskar Reddy.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "View Vijay Bhaskar Reddy's Page";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://sites.google.com/view/vjaireddy/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("ram bayapa reddy")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Here is the link for Ram Bayapa Reddy.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "View Ram Bayapa Reddy's Page";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://sites.google.com/srit.ac.in/bayapareddy/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("nagesh")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Here is the link for Nagesh.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "View Nagesh's Page";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://sites.google.com/srit.ac.in/nagesh-cse/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+else if (userInput.includes("sujatha")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Here is the link for Sujatha.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "View Sujatha's Page";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://sites.google.com/srit.ac.in/vsujatha/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("lokeshnath")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Here is the link for Lokeshnath.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "View Lokeshnath's Page";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://sites.google.com/srit.ac.in/lokeshnath-k/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+else if (userInput.includes("balakrishna")||userInput.includes("bala krishna")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Here is the link for Balakrishna's Page.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "View Balakrishna's Page";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://sites.google.com/view/drbalakrishna/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+else if (userInput.includes("sreenivas")||userInput.includes("srinivas")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Here is the link for Dr. U. Sreenivas, vice Princiapl";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "View Dr. U. Sreenivas's Page";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://sites.google.com/view/usreenivas/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+else if (userInput.includes("lokeshwari")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "I can take you to the page of Lokeswari.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "Go to Lokeswari's Page";
+  proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+  proceedButton.onclick = function() {
+    window.open("https://sites.google.com/srit.ac.in/lokeswarig/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+
+else if (userInput.includes("rohini")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Here is the link for Rohini.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "View Rohini's Page";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://sites.google.com/srit.ac.in/rohini/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("ushasree") || userInput.includes("usha")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Here is the link for Usha Sree.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "View Usha Sree's Page";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://sites.google.com/view/ushasree/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("umadevi") || userInput.includes("uma devi")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Here is the link for Umadevi.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "View Umadevi's Page";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://sites.google.com/view/kambamumadevi/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("nagaleela")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Here is the link for Nagaleela.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "View Nagaleela's Page";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://sites.google.com/srit.ac.in/nagaleela-g/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+else if (userInput.includes("sunitha")) {
+  botMessage.classList.add('message', 'received');
+  botMessage.innerHTML = "Here is the link for Sunitha.";
+  var proceedButton = document.createElement('button');
+  proceedButton.textContent = "View Sunitha's Page";
+proceedButton.classList.add('proceed-btn'); // Apply the new proceed button class  
+proceedButton.onclick = function() {
+
+    window.open("https://sites.google.com/srit.ac.in/sunitha-s/home", "_blank");
+  };
+  botMessage.appendChild(proceedButton);
+  chatContainer.appendChild(botMessage);
+}
+
+
+          else {
+            // If no match is found, ask for confirmation before opening in the internet
+            botMessage.classList.add('message', 'received');
+            botMessage.innerHTML = "Sorry, I didn't understand.<br>Check your spelling or Would you like me to open it on the internet? <br><button id='openBtn'>Open</button>";
+            chatContainer.appendChild(botMessage);
+  
+            // Wait for the user to click 'Open'
+            document.getElementById('openBtn').onclick = function() {
+              window.open(`https://www.google.com/search?q=${encodeURIComponent(userInput)}`, '_blank');
+            };
+          }
+  
+          chatContainer.scrollTop = chatContainer.scrollHeight; // Auto scroll to the latest message
+        }, 1000);
+      }
+    }
+
+    // Preserve chat history on page reload
+    window.onload = function() {
+      const chatContainer = document.getElementById('chatContainer');
+      const chatHistory = localStorage.getItem('chatHistory');
+      if (chatHistory) {
+        chatContainer.innerHTML = chatHistory;
+      }
+
+      const observer = new MutationObserver(function() {
+        localStorage.setItem('chatHistory', chatContainer.innerHTML);
+      });
+
+      observer.observe(chatContainer, { childList: true, subtree: true });
+    };
+  </script>
+</body>
+</html>

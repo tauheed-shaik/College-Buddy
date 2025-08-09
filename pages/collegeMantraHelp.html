@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="College Mantra - Your comprehensive virtual assistant for Srinivasa Ramanujan Institute of Technology (SRIT)">
+    <title>Help - College Mantra</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #f39c12;
+            --secondary-color: #e67e22;
+            --text-color: #333;
+            --bg-color: #f9f9f5;
+            --card-bg: rgba(255, 255, 240, 0.95);
+            --section-bg: rgba(240, 240, 240, 0.9);
+            --shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                        url("https://images.freecreatives.com/wp-content/uploads/2015/05/wildtextures-creased-black-paper-texture.jpg") 
+                        no-repeat center center/cover fixed;
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+
+        .skip-to-content {
+            position: absolute;
+            left: -9999px;
+            z-index: 999;
+            padding: 1em;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+        }
+
+        .skip-to-content:focus {
+            left: 50%;
+            transform: translateX(-50%);
+            top: 10px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            width: 90%;
+        }
+
+        header {
+            margin-bottom: 2rem;
+        }
+
+        h1, h2, h3 {
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 2.5rem;
+            text-align: center;
+        }
+
+        h2 {
+            color: var(--secondary-color);
+            margin: 2rem 0 1rem;
+            font-size: 1.8rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        ul {
+            margin: 1rem 0 1.5rem;
+            padding-left: 1.5rem;
+            list-style-type: none;
+        }
+
+        ul li {
+            margin-bottom: 0.75rem;
+            position: relative;
+            padding-left: 1.5rem;
+        }
+
+        ul li::before {
+            content: "▹";
+            color: var(--primary-color);
+            position: absolute;
+            left: 0;
+            font-size: 1.2rem;
+        }
+
+        ul ul {
+            margin: 0.75rem 0 0.5rem;
+        }
+
+        ul ul li::before {
+            content: "•";
+        }
+
+        a {
+            color: #2980b9;
+            text-decoration: none;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        a:hover, a:focus {
+            color: var(--primary-color);
+            text-decoration: underline;
+        }
+
+        p {
+            margin: 0.75rem 0 1rem;
+            font-size: 1.05rem;
+        }
+
+        .intro, .conclusion {
+            text-align: center;
+            padding: 1.5rem;
+            background: var(--section-bg);
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .intro p, .conclusion p {
+            max-width: 800px;
+            margin: 1rem auto;
+        }
+
+        .section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--section-bg);
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+        .section:hover {
+            box-shadow: var(--shadow);
+            transform: translateY(-3px);
+        }
+
+        .section h2 {
+            margin-top: 0;
+        }
+
+        strong {
+            color: #333;
+            font-weight: 700;
+        }
+
+        .creators {
+            text-align: center;
+            margin: 2rem 0;
+            padding: 1rem;
+            background: rgba(243, 156, 18, 0.1);
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .creators p {
+            font-weight: 500;
+        }
+
+        .footer {
+            background: rgba(0, 0, 0, 0.5);
+            color: rgba(255, 255, 255, 0.9);
+            text-align: center;
+            padding: 1rem;
+            margin-top: 2rem;
+            border-radius: var(--border-radius);
+            font-size: 0.9rem;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--primary-color);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            background: var(--secondary-color);
+        }
+
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+                width: 95%;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .section {
+                padding: 1.25rem;
+            }
+
+            .back-to-top {
+                width: 40px;
+                height: 40px;
+                bottom: 1.5rem;
+                right: 1.5rem;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            body {
+                padding: 1rem 0;
+            }
+            
+            .container {
+                padding: 1rem;
+                width: 100%;
+                border-radius: 0;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            h2 {
+                font-size: 1.3rem;
+            }
+
+            p, ul li {
+                font-size: 1rem;
+            }
+
+            .intro, .conclusion, .section {
+                padding: 1rem;
+            }
+
+            .back-to-top {
+                width: 35px;
+                height: 35px;
+                bottom: 1rem;
+                right: 1rem;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: none;
+                color: black;
+            }
+
+            .container {
+                max-width: 100%;
+                box-shadow: none;
+                padding: 0;
+            }
+
+            .back-to-top, .footer {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-to-content">Skip to content</a>
+    
+    <div class="container">
+        <header>
+            <div class="intro">
+                <h1>Welcome to College Mantra</h1>
+                <p>College Mantra is your comprehensive virtual assistant, designed to make navigating through Srinivasa Ramanujan Institute of Technology (SRIT) effortless and efficient. Whether you're a student, faculty member, or visitor, this guide provides all the information you need about campus locations, services, departments, and more.</p>
+                <p>Let College Mantra simplify your college experience!</p>
+            </div>
+        </header>
+
+        <main id="main-content">
+            <section id="location" class="section">
+                <h2>1. Location Guidance</h2>
+                <p>Find locations within the SRIT campus:</p>
+                <ul>
+                    <li><strong>Library</strong> - Central knowledge hub with extensive resources</li>
+                    <li><strong>Canteen</strong> - Food services and refreshments</li>
+                    <li><strong>CSE HOD Cabin</strong> - Computer Science Department Head office</li>
+                    <li><strong>Examination Section</strong> - For all exam-related inquiries</li>
+                    <li><strong>Fee Payment Office</strong> - For financial transactions</li>
+                    <li><strong>Computer Labs</strong> - Technology and practice centers</li>
+                    <li><strong>Faculty Room</strong> - Staff offices and meeting areas</li>
+                    <li><strong>Administration Office</strong> - For administrative matters</li>
+                </ul>
+            </section>
+
+            <section id="general" class="section">
+                <h2>2. General College Queries</h2>
+                <p>The bot answers general questions like:</p>
+                <ul>
+                    <li><strong>"Who are you?"</strong> - Learn about College Mantra's purpose</li>
+                    <li><strong>"What is your name?"</strong> - Identify the virtual assistant</li>
+                    <li><strong>"What can you do?"</strong> - Discover available features</li>
+                    <li>Polite responses to greetings like "Hi," "Hello," or "Good Morning"</li>
+                </ul>
+            </section>
+
+            <section id="faculty" class="section">
+                <h2>3. Faculty and Department Information</h2>
+                <p>Provides links and details for:</p>
+                <ul>
+                    <li><strong>Departments:</strong> Comprehensive information about academic departments
+                        <ul>
+                            <li>CSE (Computer Science Engineering)</li>
+                            <li>ECE (Electronics & Communication Engineering)</li>
+                            <li>EEE (Electrical & Electronics Engineering)</li>
+                            <li>Civil Engineering</li>
+                            <li>Mechanical Engineering</li>
+                            <li>AIML (Artificial Intelligence & Machine Learning)</li>
+                            <li>Data Science</li>
+                        </ul>
+                    </li>
+                    <li><strong>Faculty:</strong> Information about individual HODs and professors with personal profiles or websites</li>
+                </ul>
+            </section>
+
+            <section id="services" class="section">
+                <h2>4. Student Services</h2>
+                <p>Directs users to essential services:</p>
+                <ul>
+                    <li><strong>ECAP Portals:</strong> 
+                        <ul>
+                            <li>Student Login: Access academic and attendance information</li>
+                            <li>Faculty Login: Professors manage courses and grades</li>
+                        </ul>
+                    </li>
+                    <li><strong>Examination Portals:</strong> Access exam schedules, results, and notifications</li>
+                    <li><strong>Fee Payment:</strong> Online fee payment services and options</li>
+                    <li><strong>Academic Resources:</strong>
+                        <ul>
+                            <li>Academic Calendar with important dates</li>
+                            <li>Academic Regulations and policies</li>
+                            <li>Admission Procedures for new students</li>
+                            <li>Fee Structure information</li>
+                            <li>Previous Question Papers archive</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section id="clubs" class="section">
+                <h2>5. Clubs and Committees</h2>
+                <p>Details about the various clubs and committees in SRIT:</p>
+                <ul>
+                    <li><strong>Technical Clubs:</strong> Enhance your technical skills
+                        <ul>
+                            <li>Toastmasters - Public speaking and leadership</li>
+                            <li>Programmers' Club - Coding and development</li>
+                            <li>Internet Society - Web technologies and networking</li>
+                        </ul>
+                    </li>
+                    <li><strong>Cultural and Service Clubs:</strong> Cultural and community engagement
+                        <ul>
+                            <li>NCC (National Cadet Corps)</li>
+                            <li>NSS (National Service Scheme)</li>
+                            <li>Rotract Club - Community service</li>
+                        </ul>
+                    </li>
+                    <li><strong>Special Interest Clubs:</strong> Domain-specific organizations
+                        <ul>
+                            <li>IEI (Institution of Engineers India)</li>
+                            <li>IETE (Institution of Electronics and Telecommunication Engineers)</li>
+                            <li>SAE (Society of Automotive Engineers)</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section id="courses" class="section">
+                <h2>6. Courses and Departments</h2>
+                <p>Provides comprehensive information about:</p>
+                <ul>
+                    <li><strong>Departments:</strong> Detailed information about academic departments
+                        <ul>
+                            <li>CSE, AIML, Data Science</li>
+                            <li>ECE, EEE</li>
+                            <li>Civil, Mechanical Engineering</li>
+                        </ul>
+                    </li>
+                    <li><strong>Courses Offered:</strong> Detailed course structure and syllabi for academic years (e.g., R20, R19)</li>
+                </ul>
+            </section>
+
+            <section id="placements" class="section">
+                <h2>7. Placements and Training</h2>
+                <p>Information about training and placements:</p>
+                <ul>
+                    <li><strong>Placement Committee:</strong> Contact details and team members</li>
+                    <li><strong>Training Programs:</strong> Workshops and skill-building sessions</li>
+                    <li><strong>Campus Drives:</strong> Updates on placement opportunities</li>
+                    <li><strong>Placement Statistics:</strong> Insights into past placements and success stories</li>
+                </ul>
+            </section>
+
+            <section id="social" class="section">
+                <h2>8. Social Media and External Links</h2>
+                <p>Stay connected through:</p>
+                <ul>
+                    <li><strong>Social Media:</strong> Stay updated with SRIT's online presence
+                        <ul>
+                            <li>Instagram - Photos and events</li>
+                            <li>Twitter - News and announcements</li>
+                            <li>Facebook - Community engagement</li>
+                            <li>LinkedIn - Professional networking</li>
+                            <li>YouTube - Videos and lectures</li>
+                        </ul>
+                    </li>
+                    <li><strong>Official College Website:</strong> Direct access to the homepage and alumni portal</li>
+                </ul>
+            </section>
+
+            <section id="misc" class="section">
+                <h2>9. Miscellaneous Features</h2>
+                <p>Additional information:</p>
+                <ul>
+                    <li><strong>Management Details:</strong> Learn about the institution's leadership
+                        <ul>
+                            <li>Chairperson and Secretary</li>
+                            <li>Principal</li>
+                            <li>Governing and Academic Councils</li>
+                        </ul>
+                    </li>
+                    <li><strong>Notifications:</strong> Updates about college activities and results</li>
+                    <li><strong>Newsletters:</strong> Regular publications and announcements</li>
+                </ul>
+            </section>
+
+            <section id="links" class="section">
+                <h2>10. Quick Access Links</h2>
+                <p>Open external applications and portals directly:</p>
+                <ul>
+                    <li>Common applications: YouTube, WhatsApp, Calculator, Settings</li>
+                    <li>College-specific portals for exam schedules, results, and fee payments</li>
+                </ul>
+            </section>
+
+            <section id="fallback" class="section">
+                <h2>11. Fallback Functionality</h2>
+                <p>If the bot doesn't recognize a query, it redirects to a Google search for further assistance.</p>
+            </section>
+
+            <div class="creators">
+                <h2>12. Bot Creators</h2>
+                <p>The College Mantra was developed by:</p>
+                <p><strong>Madhuri-543 • Navya-555 • Tauheed-547 • Rehan-554</strong></p>
+            </div>
+
+            <div class="conclusion">
+                <h2>Thank You for Using College Mantra!</h2>
+                <p>We hope College Mantra makes your journey at SRIT more convenient and efficient. Feel free to reach out if you need any assistance!</p>
+            </div>
+        </main>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 College Mantra | All Rights Reserved | Srinivasa Ramanujan Institute of Technology</p>
+    </footer>
+
+    <a href="#" class="back-to-top" aria-label="Back to top">↑</a>
+
+    <script>
+        // Back to top button functionality
+        const backToTopButton = document.querySelector('.back-to-top');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopButton.classList.add('visible');
+            } else {
+                backToTopButton.classList.remove('visible');
+            }
+        });
+
+        backToTopButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Add smooth scrolling to all internal links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                if (this.getAttribute('href') !== '#') {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help Section - College Mantra</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #f88809;
+            --primary-dark: #342115;
+            --secondary: #55310f;
+            --text: #34495E;
+            --light-bg: #f9f9f9;
+            --highlight: #ECF0F1;
+            --accent: #e74c3c;
+            --spacing-sm: 10px;
+            --spacing-md: 20px;
+            --spacing-lg: 40px;
+            --border-radius: 12px;
+            --box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: var(--spacing-lg) var(--spacing-md);
+            text-align: center;
+            box-shadow: var(--box-shadow);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-sm);
+            letter-spacing: 0.5px;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            font-weight: 300;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: var(--spacing-lg) auto;
+            padding: 0;
+        }
+
+        .section {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+            transition: transform 0.3s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+        }
+
+        .section h2 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: var(--spacing-md);
+            position: relative;
+            padding-bottom: var(--spacing-sm);
+        }
+
+        .section h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background-color: var(--primary);
+            border-radius: 2px;
+        }
+
+        .section h3 {
+            color: var(--secondary);
+            font-size: 1.3rem;
+            margin: var(--spacing-md) 0 var(--spacing-sm);
+        }
+
+        .section p {
+            font-size: 1rem;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .use-tips {
+            background-color: var(--highlight);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--primary);
+            margin: var(--spacing-md) 0;
+        }
+
+        .features {
+            list-style-type: none;
+            padding-left: var(--spacing-md);
+        }
+
+        .features li {
+            margin-bottom: var(--spacing-md);
+            position: relative;
+            padding-left: 25px;
+        }
+
+        .features li::before {
+            content: '•';
+            color: var(--primary);
+            font-size: 1.5rem;
+            position: absolute;
+            left: 0;
+            top: -5px;
+        }
+
+        .features li strong {
+            color: var(--primary-dark);
+        }
+
+        .assistant-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-md);
+        }
+
+        .assistant-card {
+            flex: 1 1 300px;
+            background: white;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            transition: all 0.3s ease;
+        }
+
+        .assistant-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .assistant-header {
+            padding: var(--spacing-md);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .assistant-body {
+            padding: var(--spacing-md);
+        }
+
+        .assistant-examples {
+            background-color: var(--highlight);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius);
+            margin-top: var(--spacing-md);
+        }
+
+        .assistant-examples p {
+            font-weight: 500;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 500;
+            margin-top: var(--spacing-md);
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: var(--spacing-md) 0;
+        }
+
+        .comparison-table th, .comparison-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--highlight);
+        }
+
+        .comparison-table th {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background-color: var(--highlight);
+        }
+
+        .footer {
+            background: linear-gradient(135deg, var(--secondary), #1a2530);
+            color: white;
+            padding: var(--spacing-lg) var(--spacing-md);
+            text-align: center;
+            margin-top: var(--spacing-lg);
+        }
+
+        .footer p {
+            max-width: 800px;
+            margin: 0 auto var(--spacing-md);
+        }
+
+        .footer-links {
+            margin-top: var(--spacing-md);
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            margin: 0 var(--spacing-sm);
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                width: 95%;
+            }
+            
+            .section {
+                padding: var(--spacing-md);
+            }
+            
+            .assistant-card {
+                flex: 1 1 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Welcome to the Help Section!</h1>
+        <p>Your guide to using Tara and College Mantra effectively</p>
+    </header>
+
+    <div class="container">
+        <section class="section">
+            <h2>Introduction</h2>
+            <p>At SRIT, we understand how important it is to have seamless access to information. That's why we've introduced two powerful assistants to guide you through your journey. Whether you're a student, faculty member, or visitor, our virtual assistants—<strong>Tara</strong> and <strong>College Mantra</strong>—are here to make your experience more efficient, interactive, and enjoyable.</p>
+        </section>
+
+        <div class="assistant-container">
+            <div class="assistant-card">
+                <div class="assistant-header">
+                    <h2>Tara – Your Virtual Voice Assistant</h2>
+                </div>
+                <div class="assistant-body">
+                    <p>Tara is designed for interactive voice-based assistance, allowing you to stay on the go without needing to type. Perfect for multitasking or hands-free interaction!</p>
+                    
+                    <div class="use-tips">
+                        <h3>Key Features:</h3>
+                        <ul class="features">
+                            <li><strong>Voice Responses:</strong> Ask Tara anything, and it will answer you verbally.</li>
+                            <li><strong>Instant Assistance:</strong> Get quick answers about locations, schedules, events, and more.</li>
+                            <li><strong>Hands-Free Interaction:</strong> Perfect for when you're multitasking.</li>
+                            <li><strong>Personalized Help:</strong> Tara adapts to your preferences over time.</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="assistant-examples">
+                        <p><strong>Sample Voice Commands:</strong></p>
+                        <ul class="features">
+                            <li>"Open website of SRIT?"</li>
+                            <li>"Can you open faculty profile?"</li>
+                            <li>"Open student login page?"</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="assistant-card">
+                <div class="assistant-header">
+                    <h2>College Mantra – Your Chat Assistant</h2>
+                </div>
+                <div class="assistant-body">
+                    <p>College Mantra is perfect for when you prefer to type your questions and get fast, precise answers. From campus resources to event updates, College Mantra can do it all!</p>
+                    
+                    <div class="use-tips">
+                        <h3>Key Features:</h3>
+                        <ul class="features">
+                            <li><strong>Text-Based Interaction:</strong> Type and receive instant, accurate responses.</li>
+                            <li><strong>Quick Access to Resources:</strong> Get direct links to portals, schedules, club details, and more.</li>
+                            <li><strong>Event Updates:</strong> Stay in the loop with latest college events and deadlines.</li>
+                            <li><strong>Student Services:</strong> Access fee payments, academic resources, and more with ease.</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="assistant-examples">
+                        <p><strong>Sample Text Commands:</strong></p>
+                        <ul class="features">
+                            <li>"Find location of library?"</li>
+                            <li>"Open Toastmasters club?"</li>
+                            <li>"Can you open exam portal?"</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section class="section">
+            <h2>How to Choose Between Tara and College Mantra?</h2>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Tara</th>
+                        <th>College Mantra</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Interaction Type</td>
+                        <td>Voice-based</td>
+                        <td>Text-based</td>
+                    </tr>
+                    <tr>
+                        <td>Best For</td>
+                        <td>On-the-go, multitasking</td>
+                        <td>Detailed information, links</td>
+                    </tr>
+                    <tr>
+                        <td>Response Format</td>
+                        <td>Audio responses</td>
+                        <td>Text with links and resources</td>
+                    </tr>
+                    <tr>
+                        <td>Use Cases</td>
+                        <td>Quick queries while moving</td>
+                        <td>Deep research, resource access</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <p><strong>Choose Tara</strong> when you need voice responses and hands-free assistance.<br><strong>Choose College Mantra</strong> when you prefer to type for quick information and access to resources.</p>
+        </section>
+
+        <section class="section">
+            <h2>Need More Help?</h2>
+            <p>If you ever have more questions or need assistance beyond what these assistants provide, don't hesitate to reach out to our support team. Tara and College Mantra are here to guide you every step of the way, ensuring your college journey is as smooth and efficient as possible.</p>
+            <a href="contact.html" class="btn">Contact Support</a>
+        </section>
+    </div>
+
+    <footer class="footer">
+        <p>Thank you for using College Mantra and Tara. We're excited to help you navigate and succeed at SRIT. Let's get started—your virtual assistant is just a click or a voice command away!</p>
+        <div class="footer-links">
+            <a href="contact.html">Contact Support</a>
+            <a href="coverpage.html">Home</a>
+           
+        </div>
+    </footer>
+
+</body>
+</html>
