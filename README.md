@@ -121,7 +121,7 @@ For a full list of supported voice commands, see `pages/taraHelp.html`.
 ## Deployment
 
 This project is deployed on Netlify and can be accessed at:
-[https://college-buddy-srit.windsurf.build](https://clgbot.netlify.app/)
+[Demo Link](https://clgbot.netlify.app/)
 
 To deploy your own version:
 1. Fork this repository.
