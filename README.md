@@ -5,6 +5,9 @@ Welcome to **College Buddy**, a comprehensive virtual assistant suite designed f
 1. **Tara** - A voice-activated virtual assistant for hands-free information access.
 2. **College Mantra** - A text-based chat assistant for detailed queries and resource access.
 
+## Demo
+[Watch my project video](https://drive.google.com/file/d/1iMPR2xyFjLO4lF6rGorw8RrP3OTxITUD/view?usp=sharing)
+
 ## Table of Contents
 - [Features](#features)
 - [Project Structure](#project-structure)
