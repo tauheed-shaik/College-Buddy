@@ -7,6 +7,7 @@ Welcome to **College Buddy**, a comprehensive virtual assistant suite designed f
 
 ## Demo
 [Watch my project video](https://drive.google.com/file/d/1iMPR2xyFjLO4lF6rGorw8RrP3OTxITUD/view?usp=sharing)
+[![Watch the video](https://img.youtube.com/vi/W_Yvd0NA_Xo/0.jpg)](https://youtu.be/W_Yvd0NA_Xo?si=UwobPJ9bbrRH_E3q)
 
 ## Table of Contents
 - [Features](#features)
